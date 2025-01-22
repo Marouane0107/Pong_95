@@ -1,0 +1,64 @@
+<!-- {% load static %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% comment %} <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% endcomment %}
+    <title>Ping Pong</title>
+    <!-- Link the CSS file using the static tag -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="landingPage">
+        <div id="title1"> classic Ping Pong </div>
+        <h1 id="date"> 95 </h1>
+        <h1 id="Welcome">Welcome to Ping Pong Game</h1>
+        <p>Enjoy the ultimate classic Ping Pong experience!</p>
+        <button id="Player_vs_BOT">vs BOT</button>
+        <button id="Player_vs_Player">vs Player</button>
+        <button id="Multiplayer">Multiplayer</button>
+        <button id="QuitMenu">Quit</button>
+    </div>
+    <div id="gameContainer">
+    <div id="head">
+            <h1 id="title">Pong 95</h1>
+            <div id="topFrame">
+                <div id="player1">
+                    <h1 id="Name1">Player_1:</h1>
+                    <h1 id="Player_1">0</h1>
+                </div>
+                <div id="player3">
+                    <h1 id="Name3">Player_3:</h1>
+                    <h1 id="Player_3">0</h1>
+                </div>
+                <div id="player4">
+                    <h1 id="Name4">Player_4:</h1>
+                    <h1 id="Player_4">0</h1>
+                </div>
+                <div id="player2">
+                    <h1 id="Name2">Player_2:</h1>
+                    <h1 id="Player_2">0</h1>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas1" width="800" height="500"></canvas>
+        <div id="tail">
+            <span>(c) maouzal 1337</span>
+            <div class="tail-buttons">
+                <button id="Menu">Menu</button>
+                <button id="Restart">Restart</button>
+                <button id="Quit">Quit</button>
+            </div>
+        </div>
+    </div>
+    <!-- add gameover table -->
+    <div id="gameOver">
+        <h1 id="winnerText">Game Over</h1>
+        <div id="finalScore"></div>
+        <button id="playAgain">Play Again</button>
+        <button id="returnToMenu">Return to Menu</button>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
