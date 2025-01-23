@@ -71,10 +71,22 @@ function vector(x, y)
 
 document.querySelectorAll("button").forEach(button => {
 	QuitMenu.addEventListener('click', () => {
-		window.close();
+		// Try different approaches to close the window
+		if (window.opener) {
+			window.close();
+		} else {
+			window.location.href = 'about:blank';
+			window.close();
+		}
 	});
 	Quit.addEventListener("click", () => {
-		window.close();
+		// Try different approaches to close the window
+		if (window.opener) {
+			window.close();
+		} else {
+			window.location.href = 'about:blank';
+			window.close();
+		}
 	});
 	Player_vs_BOT.addEventListener('click', () => {
 		landingPage.style.display = 'none';
@@ -709,6 +721,18 @@ function drawgame()
 		player4.draw4();
 		ball.draw();
 	}
+}
+
+function saveGameStats(score, opponent, gameMode, won) {
+	const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+	fetch('/save-stats/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'X-CSRFToken': csrfToken
+		},
+		body: `score=${score}&opponent=${opponent}&game_mode=${gameMode}&won=${won}`
+	});
 }
 
 function loop()
