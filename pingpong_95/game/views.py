@@ -1,27 +1,49 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Game
+from .models import Game, Player, GameScore
 import json
 from django.contrib.auth.decorators import login_required
-from .models import GameScore
 
 def index(request):
-    game = Game.objects.first()
-    if not game:
-        game = Game.objects.create(
-            player1_score=0,
-            player2_score=0,
-            player3_score=0,
-            player4_score=0
-        )
-    else:
-        # Reset scores when loading the page
-        game.player1_score = 0
-        game.player2_score = 0
-        game.player3_score = 0
-        game.player4_score = 0
-        game.save()
-    return render(request, 'game/index.html', {'game': game})
+    # Create or get players
+    player1, _ = Player.objects.get_or_create(name="Player 1")
+    player2, _ = Player.objects.get_or_create(name="Player 2")
+    player3, _ = Player.objects.get_or_create(name="Player 3")
+    player4, _ = Player.objects.get_or_create(name="Player 4")
+
+    # Create new game
+    game = Game.objects.create(
+        player1=player1,
+        player2=player2,
+        player3=player3,
+        player4=player4,
+        player1_score=0,
+        player2_score=0,
+        player3_score=0,
+        player4_score=0
+    )
+
+    context = {
+        'game': game,
+        'player1_stats': {
+            'games_won': player1.won_games_count,  # Updated from games_won
+            'total_games': player1.games_played,
+        },
+        'player2_stats': {
+            'games_won': player2.won_games_count,  # Updated from games_won
+            'total_games': player2.games_played,
+        },
+        'player3_stats': {
+            'games_won': player3.won_games_count,  # Updated from games_won
+            'total_games': player3.games_played,
+        },
+        'player4_stats': {
+            'games_won': player4.won_games_count,  # Updated from games_won
+            'total_games': player4.games_played,
+        },
+    }
+    
+    return render(request, 'game/index.html', context)
 
 def update_game_state(request):
     if request.method == 'POST':
@@ -104,8 +126,30 @@ def start_game(request):
 
 def end_game(request):
     game = get_object_or_404(Game, id=request.POST.get('game_id'))
-    game.is_active = False
+    game.completed = True
+    
+    # Determine winner
+    scores = {
+        game.player1: game.player1_score,
+        game.player2: game.player2_score,
+        game.player3: game.player3_score,
+        game.player4: game.player4_score,
+    }
+    game.winner = max(scores.items(), key=lambda x: x[1])[0]
     game.save()
+    
+    # Save individual scores
+    for player, score in scores.items():
+        if player:
+            GameScore.objects.create(
+                game=game,
+                player=player,
+                score=score
+            )
+    
+    # Update player statistics
+    game.save_game_stats()
+    
     return redirect('index')
 
 @login_required
