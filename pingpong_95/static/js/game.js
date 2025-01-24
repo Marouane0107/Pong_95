@@ -89,18 +89,31 @@ document.querySelectorAll("button").forEach(button => {
 		}
 	});
 	Player_vs_BOT.addEventListener('click', () => {
+		initializeAudio();
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		gameStarted = true;
 		playerVSbot = true;
+		// Reset scores
+        player1.score = 0;
+        player2.score = 0;
+        document.getElementById("Player_1").innerHTML = "0";
+        document.getElementById("Player_2").innerHTML = "0";
 	});
 	Player_vs_Player.addEventListener('click', () => {
+		initializeAudio();
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		gameStarted = true;
 		playerVSplayer = true;
+		// Reset scores
+        player1.score = 0;
+        player2.score = 0;
+        document.getElementById("Player_1").innerHTML = "0";
+        document.getElementById("Player_2").innerHTML = "0";
 	});
 	Multiplayer.addEventListener('click', () => {
+		initializeAudio();
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		document.getElementById("Player_3").style.display = 'block';
@@ -109,6 +122,15 @@ document.querySelectorAll("button").forEach(button => {
 		document.getElementById("Name4").style.display = 'block';
 		gameStarted = true;
 		multiplayer = true;
+		// Reset all scores
+        player_1.score = 0;
+        player_2.score = 0;
+        player3.score = 0;
+        player4.score = 0;
+        document.getElementById("Player_1").innerHTML = "0";
+        document.getElementById("Player_2").innerHTML = "0";
+        document.getElementById("Player_3").innerHTML = "0";
+        document.getElementById("Player_4").innerHTML = "0";
 	});
 	Restart.addEventListener("click", () => {
 		resetBall(ball);
@@ -145,95 +167,296 @@ document.querySelectorAll("button").forEach(button => {
 	});
 });
 
-function Ball(pos, radius, speed) {
-    this.pos = pos;
-    this.radius = radius;
-    this.speed = speed;
+// Add Web Audio API context and setup
+let audioContext = null;
+let soundBuffers = {};
 
-    let borderSegmentHeight = canvas.height / 7;
+// Update audio context initialization with minimum latency settings
+async function initializeAudioContext() {
+    if (!audioContext) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const contextOptions = {
+            latencyHint: 'interactive',
+            sampleRate: 48000,
+            bufferSize: 128  // Smallest possible buffer
+        };
+        
+        audioContext = new AudioContext(contextOptions);
+        await audioContext.resume();
+
+        // Force minimal latency
+        if (audioContext.audioWorklet) {
+            await audioContext.audioWorklet.addModule('data:text/javascript;base64,' + btoa(`
+                class MinimalLatencyProcessor extends AudioWorkletProcessor {
+                    process(inputs, outputs) {
+                        return true;
+                    }
+                }
+                registerProcessor('minimal-latency', MinimalLatencyProcessor);
+            `));
+            const node = new AudioWorkletNode(audioContext, 'minimal-latency');
+            node.connect(audioContext.destination);
+        }
+    }
+}
+
+// Pre-create audio buffers and sources
+const audioSources = {
+    paddle: [],
+    score: []
+};
+
+// Create sound buffer pools
+const soundPools = {
+    paddle: [],
+    score: []
+};
+
+// Initialize audio with just paddle and score sounds
+async function initializeAudio() {
+    if (window.audioInitialized) return;
+    await initializeAudioContext();
+
+    try {
+        // Pre-create nodes only for paddle and score
+        for (const type of ['paddle', 'score']) {
+            audioSources[type] = [];
+            // ...rest of initialization code...
+        }
+
+        // Load only paddle and score sounds
+        const sounds = { 
+            paddle: paddleHitSound, 
+            score: scoreSound 
+        };
+        // ...rest of initialization code...
+    } catch (error) {
+        console.error("Audio initialization failed:", error);
+    }
+}
+
+// Optimized sound playing with zero latency
+function playBufferedSound(type) {
+    if (!gameSettings.soundEnabled || !audioContext) return;
+
+    const sources = audioSources[type];
+    if (!sources || !sources.length) return;
+
+    // Find least recently used source
+    const audio = sources.reduce((prev, curr) => 
+        (curr.lastUsed < prev.lastUsed) ? curr : prev
+    );
+
+    if (!audio || !audio.ready) return;
+
+    try {
+        // Disconnect old source if exists
+        if (audio.source.buffer) {
+            audio.source.disconnect();
+        }
+
+        // Create new source
+        const newSource = audioContext.createBufferSource();
+        newSource.buffer = audio.source.buffer;
+        newSource.playbackRate.value = 3.0;
+        
+        // Configure gain
+        audio.gainNode.gain.value = gameSettings.soundVolume;
+        
+        // Connect and play immediately
+        newSource.connect(audio.gainNode);
+        newSource.start(0);
+        
+        // Update source and timestamp
+        audio.source = newSource;
+        audio.lastUsed = audioContext.currentTime;
+        
+        // Cleanup
+        newSource.onended = () => {
+            newSource.disconnect();
+            audio.ready = true;
+        };
+    } catch (error) {
+        console.error("Sound playback failed:", error);
+    }
+}
+
+// Update collision prediction constants
+const COLLISION_PREDICTION = {
+    PADDLE: 2,  // Further reduced for earlier trigger
+    WALL: 1,
+    SCORE: 1
+};
+
+// Update playerCollision function
+function playerCollision(ball, player, name) {
+    let dx = Math.abs(ball.pos.x - player.getcenter().x);
+    let dy = Math.abs(ball.pos.y - player.getcenter().y);
+
+    const willCollide = (dx < (ball.radius + player.getHalfWidth() + COLLISION_PREDICTION.PADDLE) && 
+                        dy < (ball.radius + player.getHalfHeight() + COLLISION_PREDICTION.PADDLE));
+
+    if (willCollide) {
+        playBufferedSound('paddle');
+    }
+
+    if (dx < (ball.radius + player.getHalfWidth()) && 
+        dy < (ball.radius + player.getHalfHeight())) {
+        // Remove second sound play to avoid double sounds
+        // Rest of collision code...
+    }
+}
+
+// Update Ball.update method
+Ball.prototype.update = function () {
+    // Silent bounce on top and bottom
+    if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
+        this.speed.y = -this.speed.y;
+    }
+
+    // Silent bounce on the left border segments
+    if (this.pos.x - this.radius < borderWidth &&
+        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+        this.speed.x = -this.speed.x;
+    }
+
+    // Silent bounce on the right border segments
+    if (this.pos.x + this.radius > canvas.width - borderWidth &&
+        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+        this.speed.x = -this.speed.x;
+    }
+
+    this.pos.x += this.speed.x;
+    this.pos.y += this.speed.y;
+};
+
+Ball.prototype.update2 = function () {
+    const borderSegmentHeight = canvas.height / 4;
+    const borderSegmentWidth = canvas.width / 3;
     const borderWidth = 20;
 
-    const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
+    // Silent bounce on border segments
+    if (this.pos.x - this.radius < borderWidth &&
+        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+        this.speed.x = -this.speed.x;
+        this.pos.x = borderWidth + this.radius;
+    }
 
-    this.update = function () {
-        // Bounce on top and bottom
-        if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
-            this.speed.y = -this.speed.y;
+    if (this.pos.x + this.radius > canvas.width - borderWidth &&
+        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+        this.speed.x = -this.speed.x;
+        this.pos.x = canvas.width - borderWidth - this.radius;
+    }
+
+    if (this.pos.y - this.radius < borderWidth &&
+        (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+        this.speed.y = -this.speed.y;
+        this.pos.y = borderWidth + this.radius;
+    }
+
+    if (this.pos.y + this.radius > canvas.height - borderWidth &&
+        (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+        this.speed.y = -this.speed.y;
+        this.pos.y = canvas.height - borderWidth - this.radius;
+    }
+
+    this.pos.x += this.speed.x;
+    this.pos.y += this.speed.y;
+};
+
+// Update Score function
+function Score(ball, player1, player2) {
+    // Check if the ball is in the scoring area
+    if (ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
+        if (gameSettings.soundEnabled) {
+            scoreSound.currentTime = 0;
+            scoreSound.playbackRate = 1.2; // Faster playback
+            scoreSound.volume = gameSettings.soundVolume;
+            scoreSound.play().catch(error => console.log("Audio play failed:", error));
+        }
+        if (ball.pos.x <= -ball.radius) {
+            player2.score += 1;
+            document.getElementById("Player_2").innerHTML = player2.score;
+            resetBall(ball);
         }
 
-        // Bounce on the left border segments
-        if (
-            this.pos.x - this.radius < borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)
-        ) {
-            this.speed.x = -this.speed.x;
+        if (ball.pos.x >= canvas.width + ball.radius) {
+            player1.score += 1;
+            document.getElementById("Player_1").innerHTML = player1.score;
+            resetBall(ball);
+        }
+    }
+
+    // Check if a player has won
+    if (player1.score === 10 || player2.score === 10) {
+        if (gameSettings.soundEnabled) {
+            scoreSound.currentTime = 0;
+            scoreSound.volume = gameSettings.soundVolume;
+            scoreSound.play().catch(error => console.log("Audio play failed:", error));
+        }
+        gameOver(player1.score === 10 ? "Player 1" : "Player 2");
+        return;
+    }
+}
+
+// Update Score2 function
+function Score2(ball, player1, player2, player3, player4) {
+    // Check if the ball is in the scoring area
+    if (ball.pos.y <= -ball.radius || ball.pos.y >= canvas.height + ball.radius || 
+        ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
+        
+        let scoreOccurred = false;
+
+        if (lastHit === "Player_1" && !(ball.pos.x <= -ball.radius)) {
+            player1.score += 1;
+            document.getElementById("Player_1").innerHTML = player1.score;
+            scoreOccurred = true;
+        }
+        if (lastHit === "Player_3" && !(ball.pos.y <= -ball.radius)) {
+            player3.score += 1;
+            document.getElementById("Player_3").innerHTML = player3.score;
+            scoreOccurred = true;
+        }
+        if (lastHit === "Player_2" && !(ball.pos.x >= canvas.width + ball.radius)) {
+            player2.score += 1;
+            document.getElementById("Player_2").innerHTML = player2.score;
+            scoreOccurred = true;
+        }
+        if (lastHit === "Player_4" && !(ball.pos.y >= canvas.height + ball.radius)) {
+            player4.score += 1;
+            document.getElementById("Player_4").innerHTML = player4.score;
+            scoreOccurred = true;
         }
 
-        // Bounce on the right border segments
-        if (
-            this.pos.x + this.radius > canvas.width - borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)
-        ) {
-            this.speed.x = -this.speed.x;
+        // Only play sound if a score actually occurred
+        if (scoreOccurred && gameSettings.soundEnabled) {
+            scoreSound.currentTime = 0;
+            scoreSound.playbackRate = 1.2;
+            scoreSound.volume = gameSettings.soundVolume;
+            scoreSound.play().catch(error => console.log("Audio play failed:", error));
         }
 
-        this.pos.x += this.speed.x;
-        this.pos.y += this.speed.y;
-    };
-	this.update2 = function () {
-		const borderSegmentHeight = canvas.height / 4; // Match the goal size
-		const borderSegmentWidth = canvas.width / 3;   // Match the goal size
-		const borderWidth = 20;
-	
-		// Bounce on the left border segments
-		if (
-			this.pos.x - this.radius < borderWidth &&
-			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)
-		) {
-			this.speed.x = -this.speed.x;
-				this.pos.x = borderWidth + this.radius; // Prevent sticking
-		}
-	
-		// Bounce on the right border segments
-		if (
-			this.pos.x + this.radius > canvas.width - borderWidth &&
-			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)
-		) {
-			this.speed.x = -this.speed.x;
-				this.pos.x = canvas.width - borderWidth - this.radius; // Prevent sticking
-		}
-	
-		// Bounce on the top border segments
-		if (
-			this.pos.y - this.radius < borderWidth &&
-			(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)
-		) {
-			this.speed.y = -this.speed.y;
-				this.pos.y = borderWidth + this.radius; // Prevent sticking
-			}
-	
-		// Bounce on the bottom border segments
-		if (
-			this.pos.y + this.radius > canvas.height - borderWidth &&
-			(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)
-		) {
-			this.speed.y = -this.speed.y;
-				this.pos.y = canvas.height - borderWidth - this.radius; // Prevent sticking
-		}
-	
-		// Update ball position
-		this.pos.x += this.speed.x;
-		this.pos.y += this.speed.y;
-	};
-    this.draw = function () {
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-    };
+        resetBall(ball);
+    }
 
+    // Check if a player has won
+    const winningScore = 5;
+    if (player1.score === winningScore || player2.score === winningScore || 
+        player3.score === winningScore || player4.score === winningScore) {
+        
+        // Play victory sound
+        if (gameSettings.soundEnabled) {
+            scoreSound.currentTime = 0;
+            scoreSound.volume = gameSettings.soundVolume;
+            scoreSound.play().catch(error => console.log("Audio play failed:", error));
+        }
+        
+        if (player1.score === winningScore) gameover_2("Player 1");
+        else if (player2.score === winningScore) gameover_2("Player 2");
+        else if (player3.score === winningScore) gameover_2("Player 3");
+        else if (player4.score === winningScore) gameover_2("Player 4");
+        return;
+    }
 }
 
 function resetBall(ball) {
@@ -307,82 +530,6 @@ function gameover_2(winner) {
         case "Player 4": score = player4.score; break;
     }
     showGameOver(winner, score);
-}
-
-function Score(ball, player1, player2) {
-
-    if (player1.score === 10) {
-        gameOver("Player 1");
-        return; 
-    }
-
-    if (player2.score === 10) {
-        gameOver("Player 2");
-        return;
-    }
-
-    if (ball.pos.x <= -ball.radius) {
-        player2.score += 1;
-        document.getElementById("Player_2").innerHTML = player2.score;
-        resetBall(ball);
-    }
-
-    if (ball.pos.x >= canvas.width + ball.radius) {
-        player1.score += 1;
-        document.getElementById("Player_1").innerHTML = player1.score;
-        resetBall(ball);
-    }
-}
-
-
-function Score2(ball, player1, player2, player3, player4)
-{
-	
-	if (player1.score === 5) {
-		gameover_2("Player 1");
-        return;
-    }
-
-	if (player2.score === 5) {
-		gameover_2("Player 2");
-		return;
-	}
-	if (player3.score === 5) {
-		gameover_2("Player 3");
-            return;
-        }
-	if (player4.score === 5) {
-		gameover_2("Player 4");
-		return;
-	}
-	if (ball.pos.y <= -ball.radius || ball.pos.y >= canvas.height + ball.radius || ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius)
-	{
-		console.log(lastHit);
-		
-		if (lastHit === "Player_1" && !(ball.pos.x <= -ball.radius)) {
-			player1.score += 1;
-			document.getElementById("Player_1").innerHTML = player1.score;
-			resetBall(ball);
-		}
-		if (lastHit === "Player_3" && !(ball.pos.y <= -ball.radius)) {
-			player3.score += 1;
-			document.getElementById("Player_3").innerHTML = player3.score;
-            resetBall(ball);
-		}
-		if (lastHit === "Player_2" && !(ball.pos.x >= canvas.width + ball.radius)) {
-			player2.score += 1;
-			document.getElementById("Player_2").innerHTML = player2.score;
-			resetBall(ball);
-		}
-		if (lastHit === "Player_4" && !(ball.pos.y >= canvas.height + ball.radius)) {
-			player4.score += 1;
-			document.getElementById("Player_4").innerHTML = player4.score;
-			resetBall(ball);
-		}
-		if (lastHit === null) {
-			resetBall(ball);
-        }
-    }
 }
 
 function Player(pos, width, height, speed)
@@ -505,11 +652,42 @@ function Player2IA(ball, player) {
     );
 }
 
+// Get audio elements
+const paddleHitSound = document.getElementById('paddleHitSound');
+const scoreSound = document.getElementById('scoreSound');
+
+// Update playerCollision function to play sound earlier
 function playerCollision(ball, player, name) {
     let dx = Math.abs(ball.pos.x - player.getcenter().x);
     let dy = Math.abs(ball.pos.y - player.getcenter().y);
 
-    if (dx < (ball.radius + player.getHalfWidth()) && dy < (ball.radius + player.getHalfHeight())) {
+    // Increased detection range and earlier trigger
+    if (dx < (ball.radius + player.getHalfWidth() + 15) && 
+        dy < (ball.radius + player.getHalfHeight() + 15)) {
+        if (gameSettings.soundEnabled) {
+            paddleHitSound.currentTime = 0;
+            paddleHitSound.playbackRate = 1.2; // Faster playback
+            paddleHitSound.volume = gameSettings.soundVolume;
+            paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
+        }
+    }
+
+    if (dx < (ball.radius + player.getHalfWidth()) && 
+        dy < (ball.radius + player.getHalfHeight())) {
+        if (gameSettings.soundEnabled && paddleHitSound.readyState >= 2) {
+            paddleHitSound.currentTime = 0;
+            paddleHitSound.volume = gameSettings.soundVolume;
+            const playPromise = paddleHitSound.play();
+            if (playPromise) {
+                playPromise.catch(() => {
+                    // Retry playing the sound
+                    setTimeout(() => {
+                        paddleHitSound.play().catch(error => console.log("Retry failed:", error));
+                    }, 10);
+                });
+            }
+        }
+        
         // Determine if the player is horizontal or vertical
         const isHorizontal = player.getHalfWidth() > player.getHalfHeight();
 
@@ -735,6 +913,182 @@ function saveGameStats(score, opponent, gameMode, won) {
 	});
 }
 
+class GameRenderer {
+    constructor(gameId) {
+        this.gameId = gameId;
+        this.canvas = document.getElementById('canvas1');
+        this.ctx = this.canvas.getContext('2d');
+        this.setupEventListeners();
+    }
+
+    async updateGameState() {
+        const response = await fetch('/update-game-state/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                game_id: this.gameId,
+                ball_x: ball.x,
+                ball_y: ball.y,
+                player1_y: player1.y,
+                player2_y: player2.y
+            })
+        });
+
+        const gameState = await response.json();
+        this.updateRendering(gameState);
+    }
+
+    updateRendering(gameState) {
+        // Update rendering based on server response
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawGame(gameState);
+    }
+
+    drawGame(gameState) {
+        // Draw game elements based on server state
+    }
+
+    setupEventListeners() {
+        // Setup keyboard events
+    }
+}
+
+// Initialize game renderer
+const gameRenderer = new GameRenderer(document.getElementById('game_id').value);
+
+class Game {
+    constructor() {
+        // ...existing code...
+        
+        this.isPaused = false;
+        this.setupControls();
+    }
+
+    setupControls() {
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'p':
+                    this.togglePause();
+                    break;
+                // ...existing code...
+            }
+        });
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            cancelAnimationFrame(this.gameLoop);
+        } else {
+            this.gameLoop();
+        }
+    }
+
+    playSound(type) {
+        if (localStorage.getItem('soundEnabled') === 'true') {
+            this.soundEffects[type].play();
+        }
+    }
+}
+
+// Settings management
+let gameSettings = {
+    soundEnabled: true,
+    soundVolume: 0.5
+};
+
+// Load settings from localStorage
+function loadSettings() {
+    const savedSettings = localStorage.getItem('pongSettings');
+    if (savedSettings) {
+        gameSettings = JSON.parse(savedSettings);
+        document.getElementById('soundVolume').value = gameSettings.soundVolume * 100;
+        document.getElementById('soundToggle').checked = gameSettings.soundEnabled;
+    }
+}
+
+// Save settings to localStorage
+function saveSettings() {
+    gameSettings.soundVolume = parseInt(document.getElementById('soundVolume').value) / 100;
+    gameSettings.soundEnabled = document.getElementById('soundToggle').checked;
+    
+    console.log('Settings saved:', gameSettings);
+    
+    // Test sound
+    if (gameSettings.soundEnabled) {
+        paddleHitSound.volume = gameSettings.soundVolume;
+        paddleHitSound.currentTime = 0;
+        paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
+    }
+    
+    localStorage.setItem('pongSettings', JSON.stringify(gameSettings));
+    hideSettingsMenu(); // This will also resume the game
+}
+
+// Show/Hide Settings Menu
+function showSettingsMenu() {
+    document.getElementById('settingsMenu').style.display = 'block';
+    isPaused = true; // Pause the game when settings are open
+}
+
+// Update hideSettingsMenu function
+function hideSettingsMenu() {
+    const settingsMenu = document.getElementById('settingsMenu');
+    settingsMenu.style.display = 'none';
+    isPaused = false; // Resume the game when settings are closed
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    
+    document.getElementById('Settings').addEventListener('click', showSettingsMenu);
+    document.getElementById('saveSettings').addEventListener('click', saveSettings);
+    document.getElementById('cancelSettings').addEventListener('click', () => {
+        // Restore previous settings and hide menu
+        loadSettings();
+        hideSettingsMenu();
+    });
+    
+    // Example of playing sounds
+    function playPaddleHit() {
+        if (gameSettings.soundEnabled) {
+            paddleHitSound.currentTime = 0;
+            paddleHitSound.play();
+        }
+    }
+    
+    function playWallHit() {
+        if (gameSettings.soundEnabled) {
+            wallHitSound.currentTime = 0;
+            wallHitSound.play();
+        }
+    }
+    
+    function playScore() {
+        if (gameSettings.soundEnabled) {
+            scoreSound.currentTime = 0;
+            scoreSound.play();
+        }
+    }
+
+    // Remove preloadSound calls from here
+    // The sounds will be initialized on first user interaction instead
+});
+
+// Add a new variable for game pause state
+let isPaused = false;
+
+// Add escape key handler to close settings
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('settingsMenu').style.display === 'block') {
+        hideSettingsMenu();
+    }
+});
+
 function loop()
 {
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -743,7 +1097,7 @@ function loop()
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     requestAnimationFrame(loop);
-    if (!gameStarted || isGameOver) {
+    if (!gameStarted || isGameOver || isPaused) {  // Add isPaused check here
         return;
     }
     
@@ -753,3 +1107,79 @@ function loop()
 }
 
 loop();
+
+function Ball(pos, radius, speed) {
+    this.pos = pos;
+    this.radius = radius;
+    this.speed = speed;
+
+    let borderSegmentHeight = canvas.height / 7;
+    const borderWidth = 20;
+
+    const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
+
+    this.update = function () {
+        // Silent bounce on top and bottom
+        if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
+            this.speed.y = -this.speed.y;
+        }
+
+        // Silent bounce on the left border segments
+        if (this.pos.x - this.radius < borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+        }
+
+        // Silent bounce on the right border segments
+        if (this.pos.x + this.radius > canvas.width - borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+        }
+
+        this.pos.x += this.speed.x;
+        this.pos.y += this.speed.y;
+    };
+
+    this.update2 = function () {
+        const borderSegmentHeight = canvas.height / 4;
+        const borderSegmentWidth = canvas.width / 3;
+        const borderWidth = 20;
+
+        // Silent bounce on border segments
+        if (this.pos.x - this.radius < borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+            this.pos.x = borderWidth + this.radius;
+        }
+
+        if (this.pos.x + this.radius > canvas.width - borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+            this.pos.x = canvas.width - borderWidth - this.radius;
+        }
+
+        if (this.pos.y - this.radius < borderWidth &&
+            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+            this.speed.y = -this.speed.y;
+            this.pos.y = borderWidth + this.radius;
+        }
+
+        if (this.pos.y + this.radius > canvas.height - borderWidth &&
+            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+            this.speed.y = -this.speed.y;
+            this.pos.y = canvas.height - borderWidth - this.radius;
+        }
+
+        this.pos.x += this.speed.x;
+        this.pos.y += this.speed.y;
+    };
+
+    this.draw = function () {
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    };
+}

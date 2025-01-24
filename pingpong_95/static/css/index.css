@@ -393,3 +393,146 @@ h1 {
 #gameOver button:hover {
     background-color: #21a1f1;
 }
+
+/* /static/css/game.css */
+.instructions {
+    background-color: #ffffff;
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.instructions h3 {
+    font-family: 'MS Sans Serif', sans-serif;
+    color: #000080;
+    margin-bottom: 10px;
+}
+
+.instructions p {
+    font-family: 'MS Sans Serif', sans-serif;
+    color: #000000;
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.settings-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.settings-buttons button {
+    padding: 8px;
+    font-size: 1rem;
+}
+
+#saveSettings {
+    flex: 2; /* Takes up 2/3 of the space */
+}
+
+#cancelSettings {
+    flex: 1; /* Takes up 1/3 of the space */
+	margin-top: 20px;
+    padding: 8px;
+}
+
+#cancelSettings:hover {
+    background-color: #ff6b6b;
+}
+
+.settings {
+    margin-top: 15px;
+    display: flex;
+    gap: 20px;
+}
+
+.paused {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+/* Settings Menu Styles */
+#settingsMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #bfbfbf;
+    border: 2px solid #c0c0c0;
+    border-top: 2px solid #dfdfdf;
+    border-left: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    padding: 20px;
+    z-index: 1000;
+}
+
+#settingsMenu h2 {
+    font-family: 'MS Sans Serif', sans-serif;
+    color: #000000;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+}
+
+.setting-item label {
+    font-family: 'MS Sans Serif', sans-serif;
+    color: #000000;
+}
+
+#saveSettings {
+    margin-top: 20px;
+    width: 100%;
+    padding: 8px;
+}
+
+/* Sound volume slider styling */
+#soundVolume {
+    width: 150px;
+}
+
+#soundVolume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 25px;
+    background: #bfbfbf;
+    border: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    cursor: pointer;
+}
+
+#soundVolume::-moz-range-thumb {
+    width: 15px;
+    height: 25px;
+    background: #bfbfbf;
+    border: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    cursor: pointer;
+}
