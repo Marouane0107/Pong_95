@@ -20,8 +20,6 @@ let multiplayer = false;
 let lastHit = null;
 let isGameOver = false;
 
-// const line = document.getElementById("line");
-
 // Get the initial canvas size (assuming canvas is already created in HTML)
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
@@ -71,15 +69,6 @@ function vector(x, y)
 
 document.querySelectorAll("button").forEach(button => {
 	QuitMenu.addEventListener('click', () => {
-		// Try different approaches to close the window
-		if (window.opener) {
-			window.close();
-		} else {
-			window.location.href = 'about:blank';
-			window.close();
-		}
-	});
-	Quit.addEventListener("click", () => {
 		// Try different approaches to close the window
 		if (window.opener) {
 			window.close();
@@ -167,47 +156,8 @@ document.querySelectorAll("button").forEach(button => {
 	});
 });
 
-// Add Web Audio API context and setup
-let audioContext = null;
-let soundBuffers = {};
-
-// Update audio context initialization with minimum latency settings
-async function initializeAudioContext() {
-    if (!audioContext) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const contextOptions = {
-            latencyHint: 'interactive',
-            sampleRate: 48000,
-            bufferSize: 128  // Smallest possible buffer
-        };
-        
-        audioContext = new AudioContext(contextOptions);
-        await audioContext.resume();
-
-        // Force minimal latency
-        if (audioContext.audioWorklet) {
-            await audioContext.audioWorklet.addModule('data:text/javascript;base64,' + btoa(`
-                class MinimalLatencyProcessor extends AudioWorkletProcessor {
-                    process(inputs, outputs) {
-                        return true;
-                    }
-                }
-                registerProcessor('minimal-latency', MinimalLatencyProcessor);
-            `));
-            const node = new AudioWorkletNode(audioContext, 'minimal-latency');
-            node.connect(audioContext.destination);
-        }
-    }
-}
-
 // Pre-create audio buffers and sources
 const audioSources = {
-    paddle: [],
-    score: []
-};
-
-// Create sound buffer pools
-const soundPools = {
     paddle: [],
     score: []
 };
@@ -215,13 +165,11 @@ const soundPools = {
 // Initialize audio with just paddle and score sounds
 async function initializeAudio() {
     if (window.audioInitialized) return;
-    await initializeAudioContext();
 
     try {
         // Pre-create nodes only for paddle and score
         for (const type of ['paddle', 'score']) {
             audioSources[type] = [];
-            // ...rest of initialization code...
         }
 
         // Load only paddle and score sounds
@@ -229,66 +177,11 @@ async function initializeAudio() {
             paddle: paddleHitSound, 
             score: scoreSound 
         };
-        // ...rest of initialization code...
     } catch (error) {
         console.error("Audio initialization failed:", error);
     }
 }
 
-// Optimized sound playing with zero latency
-function playBufferedSound(type) {
-    if (!gameSettings.soundEnabled || !audioContext) return;
-
-    const sources = audioSources[type];
-    if (!sources || !sources.length) return;
-
-    // Find least recently used source
-    const audio = sources.reduce((prev, curr) => 
-        (curr.lastUsed < prev.lastUsed) ? curr : prev
-    );
-
-    if (!audio || !audio.ready) return;
-
-    try {
-        // Disconnect old source if exists
-        if (audio.source.buffer) {
-            audio.source.disconnect();
-        }
-
-        // Create new source
-        const newSource = audioContext.createBufferSource();
-        newSource.buffer = audio.source.buffer;
-        newSource.playbackRate.value = 3.0;
-        
-        // Configure gain
-        audio.gainNode.gain.value = gameSettings.soundVolume;
-        
-        // Connect and play immediately
-        newSource.connect(audio.gainNode);
-        newSource.start(0);
-        
-        // Update source and timestamp
-        audio.source = newSource;
-        audio.lastUsed = audioContext.currentTime;
-        
-        // Cleanup
-        newSource.onended = () => {
-            newSource.disconnect();
-            audio.ready = true;
-        };
-    } catch (error) {
-        console.error("Sound playback failed:", error);
-    }
-}
-
-// Update collision prediction constants
-const COLLISION_PREDICTION = {
-    PADDLE: 2,  // Further reduced for earlier trigger
-    WALL: 1,
-    SCORE: 1
-};
-
-// Update playerCollision function
 function playerCollision(ball, player, name) {
     let dx = Math.abs(ball.pos.x - player.getcenter().x);
     let dy = Math.abs(ball.pos.y - player.getcenter().y);
@@ -302,12 +195,9 @@ function playerCollision(ball, player, name) {
 
     if (dx < (ball.radius + player.getHalfWidth()) && 
         dy < (ball.radius + player.getHalfHeight())) {
-        // Remove second sound play to avoid double sounds
-        // Rest of collision code...
     }
 }
 
-// Update Ball.update method
 Ball.prototype.update = function () {
     // Silent bounce on top and bottom
     if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
@@ -364,7 +254,7 @@ Ball.prototype.update2 = function () {
     this.pos.y += this.speed.y;
 };
 
-// Update Score function
+// Score function for two players
 function Score(ball, player1, player2) {
     // Check if the ball is in the scoring area
     if (ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
@@ -399,7 +289,7 @@ function Score(ball, player1, player2) {
     }
 }
 
-// Update Score2 function
+// score function for multiplayer
 function Score2(ball, player1, player2, player3, player4) {
     // Check if the ball is in the scoring area
     if (ball.pos.y <= -ball.radius || ball.pos.y >= canvas.height + ball.radius || 
@@ -465,7 +355,7 @@ function resetBall(ball) {
 
     lastHit = null;
     ball.pos.x = canvas.width / 2;
-    ball.pos.y = (Math.random() * (canvas.height - 200)) + 100;
+    ball.pos.y = canvas.height / 2;
 
     // Set initial speed for both axes
     ball.speed.x = StartSpeed * randomDirection;
@@ -479,7 +369,7 @@ function resetPosition_2(player1, player2, player3, player4) {
     player1.pos = vector(20, canvas.height / 2 - playerHeight / 2);
     player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
     player3.pos = vector(canvas.width / 2 - playerHeight / 2, 20);
-    player4.pos = vector(canvas.width / 2 - 20 - playerHeight / 2, canvas.height - playerWidth - 20);
+    player4.pos = vector(canvas.width / 2 - playerHeight / 2, canvas.height - playerWidth - 20);
 }
 
 function resetPosition(player1, player2) {
@@ -497,6 +387,16 @@ function showGameOver(winner, score) {
     finalScore.textContent = `Final Score: ${score}`;
     gameOverScreen.style.display = 'flex';
     gameContainer.style.opacity = '0.5';
+
+    // Format game data for saving
+    const gameData = {
+        game_type: playerVSbot ? 'PVB' : (multiplayer ? 'MP' : 'PVP'),
+        player1_score: player1.score,
+        player2_score: player2.score,
+        winner: winner === "Player 1" ? 1 : 2
+    };
+
+    saveGameResult(gameData);
 }
 
 document.getElementById('playAgain').addEventListener('click', () => {
@@ -530,6 +430,82 @@ function gameover_2(winner) {
         case "Player 4": score = player4.score; break;
     }
     showGameOver(winner, score);
+}
+
+function Ball(pos, radius, speed) {
+    this.pos = pos;
+    this.radius = radius;
+    this.speed = speed;
+
+    let borderSegmentHeight = canvas.height / 7;
+    const borderWidth = 20;
+
+    const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
+
+    this.update = function () {
+        // Silent bounce on top and bottom
+        if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
+            this.speed.y = -this.speed.y;
+        }
+
+        // Silent bounce on the left border segments
+        if (this.pos.x - this.radius < borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+        }
+
+        // Silent bounce on the right border segments
+        if (this.pos.x + this.radius > canvas.width - borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+        }
+
+        this.pos.x += this.speed.x;
+        this.pos.y += this.speed.y;
+    };
+
+    this.update2 = function () {
+        const borderSegmentHeight = canvas.height / 4;
+        const borderSegmentWidth = canvas.width / 3;
+        const borderWidth = 20;
+
+        // Silent bounce on border segments
+        if (this.pos.x - this.radius < borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+            this.pos.x = borderWidth + this.radius;
+        }
+
+        if (this.pos.x + this.radius > canvas.width - borderWidth &&
+            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+            this.speed.x = -this.speed.x;
+            this.pos.x = canvas.width - borderWidth - this.radius;
+        }
+
+        if (this.pos.y - this.radius < borderWidth &&
+            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+            this.speed.y = -this.speed.y;
+            this.pos.y = borderWidth + this.radius;
+        }
+
+        if (this.pos.y + this.radius > canvas.height - borderWidth &&
+            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+            this.speed.y = -this.speed.y;
+            this.pos.y = canvas.height - borderWidth - this.radius;
+        }
+
+        this.pos.x += this.speed.x;
+        this.pos.y += this.speed.y;
+    };
+
+    this.draw = function () {
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    };
 }
 
 function Player(pos, width, height, speed)
@@ -636,12 +612,12 @@ function Player2IA(ball, player) {
         if (ball.speed.x > 0) {
             // Add "reaction time" - only move when ball is in bot's half
             if (ball.pos.x > canvas.width / 2) {
-                player.pos.y += Math.sign(distance) * (player.speed * 0.8); // Slightly slower than player speed
+                player.pos.y += Math.sign(distance) * (player.speed * 0.9);
             }
         } else {
             // Return to center when ball is moving away
             const centerY = canvas.height / 2 - player.height / 2;
-            player.pos.y += Math.sign(centerY - player.pos.y) * (player.speed * 0.4); // Even slower return to center
+            player.pos.y += Math.sign(centerY - player.pos.y) * (player.speed * 0.5);
         }
     }
 
@@ -662,8 +638,8 @@ function playerCollision(ball, player, name) {
     let dy = Math.abs(ball.pos.y - player.getcenter().y);
 
     // Increased detection range and earlier trigger
-    if (dx < (ball.radius + player.getHalfWidth() + 15) && 
-        dy < (ball.radius + player.getHalfHeight() + 15)) {
+    if (dx < (ball.radius + player.getHalfWidth()) && 
+        dy < (ball.radius + player.getHalfHeight())) {
         if (gameSettings.soundEnabled) {
             paddleHitSound.currentTime = 0;
             paddleHitSound.playbackRate = 1.2; // Faster playback
@@ -731,8 +707,6 @@ function playerCollision(ball, player, name) {
         }
     }
 }
-
-
 
 function drawfield()
 {
@@ -901,99 +875,6 @@ function drawgame()
 	}
 }
 
-function saveGameStats(score, opponent, gameMode, won) {
-	const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-	fetch('/save-stats/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'X-CSRFToken': csrfToken
-		},
-		body: `score=${score}&opponent=${opponent}&game_mode=${gameMode}&won=${won}`
-	});
-}
-
-class GameRenderer {
-    constructor(gameId) {
-        this.gameId = gameId;
-        this.canvas = document.getElementById('canvas1');
-        this.ctx = this.canvas.getContext('2d');
-        this.setupEventListeners();
-    }
-
-    async updateGameState() {
-        const response = await fetch('/update-game-state/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({
-                game_id: this.gameId,
-                ball_x: ball.x,
-                ball_y: ball.y,
-                player1_y: player1.y,
-                player2_y: player2.y
-            })
-        });
-
-        const gameState = await response.json();
-        this.updateRendering(gameState);
-    }
-
-    updateRendering(gameState) {
-        // Update rendering based on server response
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawGame(gameState);
-    }
-
-    drawGame(gameState) {
-        // Draw game elements based on server state
-    }
-
-    setupEventListeners() {
-        // Setup keyboard events
-    }
-}
-
-// Initialize game renderer
-const gameRenderer = new GameRenderer(document.getElementById('game_id').value);
-
-class Game {
-    constructor() {
-        // ...existing code...
-        
-        this.isPaused = false;
-        this.setupControls();
-    }
-
-    setupControls() {
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'p':
-                    this.togglePause();
-                    break;
-                // ...existing code...
-            }
-        });
-    }
-
-    togglePause() {
-        this.isPaused = !this.isPaused;
-        if (this.isPaused) {
-            cancelAnimationFrame(this.gameLoop);
-        } else {
-            this.gameLoop();
-        }
-    }
-
-    playSound(type) {
-        if (localStorage.getItem('soundEnabled') === 'true') {
-            this.soundEffects[type].play();
-        }
-    }
-}
-
 // Settings management
 let gameSettings = {
     soundEnabled: true,
@@ -1052,31 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSettings();
         hideSettingsMenu();
     });
-    
-    // Example of playing sounds
-    function playPaddleHit() {
-        if (gameSettings.soundEnabled) {
-            paddleHitSound.currentTime = 0;
-            paddleHitSound.play();
-        }
-    }
-    
-    function playWallHit() {
-        if (gameSettings.soundEnabled) {
-            wallHitSound.currentTime = 0;
-            wallHitSound.play();
-        }
-    }
-    
-    function playScore() {
-        if (gameSettings.soundEnabled) {
-            scoreSound.currentTime = 0;
-            scoreSound.play();
-        }
-    }
-
-    // Remove preloadSound calls from here
-    // The sounds will be initialized on first user interaction instead
 });
 
 // Add a new variable for game pause state
@@ -1088,6 +944,49 @@ document.addEventListener('keydown', (e) => {
         hideSettingsMenu();
     }
 });
+
+async function saveGameResult(gameData) {
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Format the game data properly
+        const formattedData = {
+            game_type: gameData.game_type || 'PVP',
+            player1: 1,  // Default player IDs
+            player2: 2,
+            player1_score: gameData.player1_score || 0,
+            player2_score: gameData.player2_score || 0,
+            winner: gameData.player1_score > gameData.player2_score ? 1 : 2
+        };
+
+        const response = await fetch('/save-game-result/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(formattedData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        console.log('Game result saved successfully');
+    } catch (error) {
+        console.error('Failed to save game result:', error);
+    }
+}
+  
+  // Example gameData format
+  const gameData = {
+    game_type: "PVP",
+    player1: 1,         // User ID
+    player2: 2,         // User ID
+    player1_score: 10,
+    player2_score: 8,
+    winner: 1
+  };
 
 function loop()
 {
@@ -1107,79 +1006,3 @@ function loop()
 }
 
 loop();
-
-function Ball(pos, radius, speed) {
-    this.pos = pos;
-    this.radius = radius;
-    this.speed = speed;
-
-    let borderSegmentHeight = canvas.height / 7;
-    const borderWidth = 20;
-
-    const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
-
-    this.update = function () {
-        // Silent bounce on top and bottom
-        if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
-            this.speed.y = -this.speed.y;
-        }
-
-        // Silent bounce on the left border segments
-        if (this.pos.x - this.radius < borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-        }
-
-        // Silent bounce on the right border segments
-        if (this.pos.x + this.radius > canvas.width - borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-        }
-
-        this.pos.x += this.speed.x;
-        this.pos.y += this.speed.y;
-    };
-
-    this.update2 = function () {
-        const borderSegmentHeight = canvas.height / 4;
-        const borderSegmentWidth = canvas.width / 3;
-        const borderWidth = 20;
-
-        // Silent bounce on border segments
-        if (this.pos.x - this.radius < borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-            this.pos.x = borderWidth + this.radius;
-        }
-
-        if (this.pos.x + this.radius > canvas.width - borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-            this.pos.x = canvas.width - borderWidth - this.radius;
-        }
-
-        if (this.pos.y - this.radius < borderWidth &&
-            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-            this.speed.y = -this.speed.y;
-            this.pos.y = borderWidth + this.radius;
-        }
-
-        if (this.pos.y + this.radius > canvas.height - borderWidth &&
-            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-            this.speed.y = -this.speed.y;
-            this.pos.y = canvas.height - borderWidth - this.radius;
-        }
-
-        this.pos.x += this.speed.x;
-        this.pos.y += this.speed.y;
-    };
-
-    this.draw = function () {
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-    };
-}

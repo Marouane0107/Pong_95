@@ -1,10 +1,8 @@
 from django.urls import path
-from . import views
+from .views import save_game_result, index, game_results
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('update-game-state/', views.update_game_state, name='update_game_state'),
-    path('start-game/', views.start_game, name='start_game'),
-    path('end-game/', views.end_game, name='end_game'),
-    path('update-score/<str:player>/', views.update_score, name='update_score'),
+    path('', index, name='index'),
+    path('save-game-result/', save_game_result, name='save_game_result'),
+    path('game-results/', game_results, name='game_results'),
 ]

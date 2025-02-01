@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block content %}
+<form id="game-result-form">
+    {% csrf_token %}
+</form>
 <input type="hidden" id="game_id" value="{{ game.id }}">
 <div id="landingPage" class="game-screen">
     <div id="title1"> classic Ping Pong </div>
