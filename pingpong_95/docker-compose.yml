@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    environment:
+      - DEBUG=1
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@gmail.com
+      - DJANGO_SUPERUSER_PASSWORD=admin123
+      - DJANGO_SETTINGS_MODULE=pingpong_95.settings
+      - DB_HOST=db
+      - DB_NAME=game_db
+      - DB_USER=admin
+      - DB_PASSWORD=postgres123
+    volumes:
+      - .:/pingpong_95
+    depends_on:
+      db:
+        condition: service_healthy
+    # Optional: if you decide to expose the port for development purposes
+    ports:
+      - "8000:8000"  # Optional, can be removed if using uwsgi
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=game_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d game_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
