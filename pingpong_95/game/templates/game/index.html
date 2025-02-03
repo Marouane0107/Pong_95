@@ -2,19 +2,25 @@
 {% load static %}
 
 {% block content %}
-<form id="game-result-form">
-    {% csrf_token %}
-</form>
+{% csrf_token %}
 <input type="hidden" id="game_id" value="{{ game.id }}">
 <div id="landingPage" class="game-screen">
     <div id="title1"> classic Ping Pong </div>
     <h1 id="date"> 95 </h1>
     <h1 id="Welcome">Welcome to Ping Pong Game</h1>
     <p>Enjoy the ultimate classic Ping Pong experience!</p>
-    <button id="Player_vs_BOT">vs BOT</button>
-    <button id="Player_vs_Player">vs Player</button>
-    <button id="Multiplayer">Multiplayer</button>
-    <button id="QuitMenu">Quit</button>
+    <div class="button-container">
+        <div class="main-buttons">
+            <button id="Player_vs_BOT">vs BOT</button>
+            <button id="Player_vs_Player">vs Player</button>
+            <button id="Multiplayer">Multiplayer</button>
+            <button id="Matchmaking">Matchmaking</button>
+            <button id="Tournament">Tournament</button>
+        </div>
+        <div class="quit-container">
+            <button id="QuitMenu">Quit</button>
+        </div>
+    </div>
 </div>
 <div id="gameContainer" class="game-screen">
     <div id="head">

@@ -19,6 +19,7 @@ let playerVSbot = false;
 let multiplayer = false;
 let lastHit = null;
 let isGameOver = false;
+let resultSaved = false;
 
 // Get the initial canvas size (assuming canvas is already created in HTML)
 const canvasWidth = canvas.width;
@@ -79,6 +80,7 @@ document.querySelectorAll("button").forEach(button => {
 	});
 	Player_vs_BOT.addEventListener('click', () => {
 		initializeAudio();
+        resultSaved = false;
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		gameStarted = true;
@@ -91,6 +93,7 @@ document.querySelectorAll("button").forEach(button => {
 	});
 	Player_vs_Player.addEventListener('click', () => {
 		initializeAudio();
+        resultSaved = false;
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		gameStarted = true;
@@ -103,6 +106,7 @@ document.querySelectorAll("button").forEach(button => {
 	});
 	Multiplayer.addEventListener('click', () => {
 		initializeAudio();
+        resultSaved = false;
 		landingPage.style.display = 'none';
 		gameContainer.style.display = 'flex';
 		document.getElementById("Player_3").style.display = 'block';
@@ -122,6 +126,8 @@ document.querySelectorAll("button").forEach(button => {
         document.getElementById("Player_4").innerHTML = "0";
 	});
 	Restart.addEventListener("click", () => {
+        console.log("Restart button clicked");
+        saveInterruptedGame('Game Restarted');
 		resetBall(ball);
         if (multiplayer) {
             resetPosition_2(player_1, player_2, player3, player4);
@@ -154,6 +160,12 @@ document.querySelectorAll("button").forEach(button => {
 		playerVSbot = false;
 		multiplayer = false;
 	});
+    // Add window unload handler for browser close/refresh
+    window.addEventListener('beforeunload', (event) => {
+        if (gameStarted && !isGameOver) {
+            saveInterruptedGame('browser_close');
+        }
+    });
 });
 
 // Pre-create audio buffers and sources
@@ -382,7 +394,6 @@ function showGameOver(winner, score) {
     const finalScore = document.getElementById('finalScore');
     const winnerText = document.getElementById('winnerText');
     
-    isGameOver = true;
     winnerText.textContent = `${winner} Wins!`;
     finalScore.textContent = `Final Score: ${score}`;
     gameOverScreen.style.display = 'flex';
@@ -391,9 +402,11 @@ function showGameOver(winner, score) {
     // Format game data for saving
     const gameData = {
         game_type: playerVSbot ? 'PVB' : (multiplayer ? 'MP' : 'PVP'),
-        player1_score: player1.score,
-        player2_score: player2.score,
-        winner: winner === "Player 1" ? 1 : 2
+        player1_score: multiplayer ? player_1.score : player1.score,
+        player2_score: multiplayer ? player_2.score : player2.score,
+        player3_score: multiplayer ? player3.score : 0,
+        player4_score: multiplayer ? player4.score : 0,
+        winner: winner.replace("Player ", "")  // Extract player number
     };
 
     saveGameResult(gameData);
@@ -403,6 +416,7 @@ document.getElementById('playAgain').addEventListener('click', () => {
     document.getElementById('gameOver').style.display = 'none';
     gameContainer.style.opacity = '1';
     isGameOver = false;
+    resultSaved = false;
     Restart.click();
 });
 
@@ -410,6 +424,7 @@ document.getElementById('returnToMenu').addEventListener('click', () => {
     document.getElementById('gameOver').style.display = 'none';
     gameContainer.style.opacity = '1';
     isGameOver = false;
+    resultSaved = false;
     Menu.click();
 });
 
@@ -946,17 +961,22 @@ document.addEventListener('keydown', (e) => {
 });
 
 async function saveGameResult(gameData) {
+    // resultSaved = true;
     try {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
+
         // Format the game data properly
         const formattedData = {
-            game_type: gameData.game_type || 'PVP',
-            player1: 1,  // Default player IDs
+            game_type: gameData.game_type,
+            player1: 1,
             player2: 2,
+            player3: gameData.game_type === 'MP' ? 3 : null,
+            player4: gameData.game_type === 'MP' ? 4 : null,
             player1_score: gameData.player1_score || 0,
             player2_score: gameData.player2_score || 0,
-            winner: gameData.player1_score > gameData.player2_score ? 1 : 2
+            player3_score: gameData.player3_score || 0,
+            player4_score: gameData.player4_score || 0,
+            winner: parseInt(gameData.winner) || 'none'
         };
 
         const response = await fetch('/save-game-result/', {
@@ -977,16 +997,43 @@ async function saveGameResult(gameData) {
         console.error('Failed to save game result:', error);
     }
 }
-  
-  // Example gameData format
-  const gameData = {
-    game_type: "PVP",
-    player1: 1,         // User ID
-    player2: 2,         // User ID
-    player1_score: 10,
-    player2_score: 8,
-    winner: 1
-  };
+
+// this function to save interrupted game data
+function saveInterruptedGame(reason) {
+    // Only save if game has actually started and there's been some progress
+    if (!gameStarted || resultSaved) return;
+    // Determine actual game type
+    let currentGameType;
+    if (playerVSbot) {
+        currentGameType = 'PVB';
+    } else if (multiplayer) {
+        currentGameType = 'MP';
+    } else if (playerVSplayer) {
+        currentGameType = 'PVP';
+    } else {
+        return; // Don't save if no valid game type
+    }
+
+    // Get current scores based on game type
+    const gameData = {
+        game_type: currentGameType,
+        player1_score: currentGameType === 'MP' ? player_1.score : player1.score,
+        player2_score: currentGameType === 'MP' ? player_2.score : player2.score,
+        player3_score: currentGameType === 'MP' ? player3.score : 0,
+        player4_score: currentGameType === 'MP' ? player4.score : 0,
+        winner: 'none'
+    };
+
+    // Check if any scoring has occurred
+    const hasScores = Object.values(gameData)
+        .filter(value => typeof value === 'number')
+        .some(score => score > 0);
+
+    if (hasScores || reason === 'browser_close') {
+        console.log(`Game interrupted (${reason}):`, gameData);
+        saveGameResult(gameData);
+    }
+}
 
 function loop()
 {
@@ -999,10 +1046,12 @@ function loop()
     if (!gameStarted || isGameOver || isPaused) {  // Add isPaused check here
         return;
     }
-    
     update();
     drawgame();
-
 }
 
 loop();
+
+
+// do samthing about data saving when the gameOver saving is not working ( there is a loop problem couseding the data to be saved multiple times)
+// adding local match making feature to the game

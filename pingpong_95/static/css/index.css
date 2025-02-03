@@ -35,6 +35,9 @@ body {
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
 	background-color: #bfbfbf; /* Windows 95 gray */
 	color: white;
+    padding: 30px;
+    overflow: hidden; /* Prevent content from spilling out */
+    gap: 15px; /* Add consistent spacing between elements */
 }
 
 /* title */
@@ -42,9 +45,9 @@ body {
 	font-family: 'MS Sans Serif', sans-serif;
 	color: white;
 	text-shadow: 2px 2px #000080;
-	font-size: 3rem;  /* Increased font size */
-	margin-bottom: 10px;
-	margin-top: 50px;
+	font-size: 2.8rem;
+	margin-bottom: 0;
+	margin-top: 20px;
 }
 
 #title {
@@ -57,93 +60,79 @@ body {
 #date {
 	font-family: Arial, sans-serif;
 	color: red;
-	font-size: 5rem;  /* Increased font size */
+	font-size: 4.5rem;
+    margin: 0;
+    line-height: 1;
 }
 
 #Welcome
 {
 	font-family: Arial, sans-serif;
 	color: white;
-	font-size: 1.4rem;  /* Increased font size */
-	margin-bottom: 30px;
+	font-size: 1.3rem;
+	margin: 15px 0 5px 0;
 	color: rgb(0, 255, 229);
 }
 
 /* Button to start the game */
-#Player_vs_BOT {
-	background-color: #bfbfbf;
-	color: black;
-	padding: 10px 25px;
-	font-size: 1.2rem;
-	border: 2px solid #dfdfdf;
+#Player_vs_BOT,
+#Player_vs_Player,
+#Multiplayer,
+#Matchmaking,
+#Tournament{  /* Add QuitMenu to main button styles */
+    font-family: 'MS Sans Serif', sans-serif;
+    background-color: #bfbfbf;
+    color: black;
+    padding: 8px 12px; /* Increased vertical padding */
+    font-size: 0.95rem;
+    border: 2px solid #dfdfdf;
     border-right: 2px solid #808080;
     border-bottom: 2px solid #808080;
-	box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 170px; /* Reduced width */
+    height: 36px; /* Increased height */
+    text-align: center;
 }
 
-#Player_vs_BOT:hover {
-	background-color: #21a1f1;
+#Player_vs_BOT:hover,
+#Player_vs_Player:hover,
+#Multiplayer:hover,
+#Matchmaking:hover,
+#Tournament:hover {
+    background-color: #0078d7; /* Windows 95 highlight blue */
+    color: white;
 }
-
-#Player_vs_Player {
-	font-family: Arial, sans-serif;
-	background-color: #bfbfbf;
-	color: black;
-	padding: 10px 20px;
-	font-size: 1.2rem;
-	border: 2px solid #dfdfdf;
+#QuitMenu {
+    width: 85px; /* Reduced width */
+    height: 34px; /* Increased height */
+    font-size: 0.95rem;
+    background-color: #bfbfbf;
+    border: 2px solid #dfdfdf;
     border-right: 2px solid #808080;
     border-bottom: 2px solid #808080;
-	box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
-}
-
-#Player_vs_Player:hover {
-	background-color: #21a1f1;
-}
-
-#Multiplayer {
-	font-family: Arial, sans-serif;
-	background-color: #bfbfbf;
-	color: black;
-	padding: 10px 20px;
-	font-size: 1.2rem;
-	border: 2px solid #dfdfdf;
-    border-right: 2px solid #808080;
-    border-bottom: 2px solid #808080;
-	box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
-}
-
-#Multiplayer:hover {
-	background-color: #21a1f1;
-}
-
-#QuitMenu{
-	background-color: #bfbfbf;
-	color: black;
-	padding: 10px 20px;
-	font-size: 1rem;
-	border: 2px solid #dfdfdf;
-    border-right: 2px solid #808080;
-    border-bottom: 2px solid #808080;
-	box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 10px;
-	margin-bottom: 20px;
-	margin-left: 85%;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    cursor: pointer;
 }
 
 #QuitMenu:hover {
-	background-color: red;
+    background-color: #ff6b6b;
+    color: white;
+}
+
+/* Active state for buttons */
+#Player_vs_BOT:active,
+#Player_vs_Player:active,
+#Multiplayer:active,
+#Matchmaking:active,
+#Tournament:active,
+#QuitMenu:active {
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #ffffff;
+    transform: translateY(1px);
 }
 
 /* Title and Header Section */
@@ -219,6 +208,8 @@ body {
 }
 
 button {
+    width: 50px;
+    height: 30px;
 	background-color: #bfbfbf;
 	border: 2px solid #dfdfdf;
     border-right: 2px solid #808080;
@@ -231,6 +222,17 @@ button {
 	margin-left: 5px;
 	cursor: pointer;
 	transition: background-color 1s ease;
+}
+
+#Menu,
+#Settings,
+#Restart,
+#Quit {
+    width: 100px;  /* Fixed width for control buttons */
+    height: 30px;  /* Fixed height for control buttons */
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    margin-left: 5px;
 }
 
 #Quit:active {
@@ -354,6 +356,8 @@ h1 {
     color: white;
     z-index: 1000;
     font-family: 'MS Sans Serif', sans-serif;
+    padding: 30px;
+    gap: 15px;
 }
 
 #winnerText {
@@ -376,18 +380,35 @@ h1 {
     margin-bottom: 40px;
 }
 
+/* Game Over Screen Button Styles */
 #gameOver button {
     background-color: #bfbfbf;
     color: black;
-    padding: 10px 25px;
-    font-size: 1.2rem;
+    width: 200px; /* Fixed width */
+    height: 100px; /* Fixed height */
+    font-size: 1.1rem;
     border: 2px solid #dfdfdf;
     border-right: 2px solid #808080;
     border-bottom: 2px solid #808080;
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin: 10px 0;
+    transition: background-color 0.2s ease;
+    margin: 5px 0;
+    text-align: center;
+    display: block; /* Ensure block display */
+}
+
+#gameOver button:hover {
+    background-color: #0078d7;
+    color: white;
+}
+
+#gameOver button:active {
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #ffffff;
+    transform: translateY(1px);
 }
 
 #gameOver button:hover {
@@ -535,4 +556,30 @@ h1 {
     border-right: 2px solid #808080;
     border-bottom: 2px solid #808080;
     cursor: pointer;
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 180px; /* Reduced from 200px */
+    padding-bottom: 20px; /* Add space for quit button */
+}
+
+/* Main buttons group */
+.main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Quit button container */
+.quit-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
 }
