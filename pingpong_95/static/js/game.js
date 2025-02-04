@@ -127,28 +127,15 @@ document.querySelectorAll("button").forEach(button => {
 	});
 	Restart.addEventListener("click", () => {
         console.log("Restart button clicked");
-        saveInterruptedGame('Game Restarted');
+        saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
 		resetBall(ball);
-        if (multiplayer) {
-            resetPosition_2(player_1, player_2, player3, player4);
-            player_1.score = 0;
-            player_2.score = 0;
-            player3.score = 0;
-            player4.score = 0;
-            document.getElementById("Player_1").innerHTML = player_1.score;
-            document.getElementById("Player_2").innerHTML = player_2.score;
-            document.getElementById("Player_3").innerHTML = player3.score;
-            document.getElementById("Player_4").innerHTML = player4.score;
-        } else {
-            resetPosition(player1, player2);
-            player1.score = 0;
-            player2.score = 0;
-            document.getElementById("Player_1").innerHTML = player1.score;
-            document.getElementById("Player_2").innerHTML = player2.score;
-        }
+        setAlltoZero();
 	});
 	Menu.addEventListener("click", () => {
-		Restart.click();
+        resetBall(ball);
+        console.log("Menu button clicked");
+		setAlltoZero();
+        saveInterruptedGame('Return to Menu before the game over');
 		landingPage.style.display = 'flex'; // Show landing page
 		gameContainer.style.display = 'none'; // Hide game container
 		document.getElementById("Player_3").style.display = 'none';
@@ -167,6 +154,26 @@ document.querySelectorAll("button").forEach(button => {
         }
     });
 });
+
+function setAlltoZero() {
+    if (multiplayer) {
+        resetPosition_2(player_1, player_2, player3, player4);
+        player_1.score = 0;
+        player_2.score = 0;
+        player3.score = 0;
+        player4.score = 0;
+        document.getElementById("Player_1").innerHTML = player_1.score;
+        document.getElementById("Player_2").innerHTML = player_2.score;
+        document.getElementById("Player_3").innerHTML = player3.score;
+        document.getElementById("Player_4").innerHTML = player4.score;
+    } else {
+        resetPosition(player1, player2);
+        player1.score = 0;
+        player2.score = 0;
+        document.getElementById("Player_1").innerHTML = player1.score;
+        document.getElementById("Player_2").innerHTML = player2.score;
+    }
+}
 
 // Pre-create audio buffers and sources
 const audioSources = {
@@ -390,6 +397,8 @@ function resetPosition(player1, player2) {
 }
 
 function showGameOver(winner, score) {
+    isPaused = true;
+    
     const gameOverScreen = document.getElementById('gameOver');
     const finalScore = document.getElementById('finalScore');
     const winnerText = document.getElementById('winnerText');
@@ -398,7 +407,7 @@ function showGameOver(winner, score) {
     finalScore.textContent = `Final Score: ${score}`;
     gameOverScreen.style.display = 'flex';
     gameContainer.style.opacity = '0.5';
-
+    
     // Format game data for saving
     const gameData = {
         game_type: playerVSbot ? 'PVB' : (multiplayer ? 'MP' : 'PVP'),
@@ -406,26 +415,33 @@ function showGameOver(winner, score) {
         player2_score: multiplayer ? player_2.score : player2.score,
         player3_score: multiplayer ? player3.score : 0,
         player4_score: multiplayer ? player4.score : 0,
-        winner: winner.replace("Player ", "")  // Extract player number
+        winner: winner.replace("Player ", "")
     };
-
+    
+    if (resultSaved) return;  // Prevent duplicate saves
+    resultSaved = true;  // Mark as saved
     saveGameResult(gameData);
 }
+
 
 document.getElementById('playAgain').addEventListener('click', () => {
     document.getElementById('gameOver').style.display = 'none';
     gameContainer.style.opacity = '1';
     isGameOver = false;
-    resultSaved = false;
+    isPaused = false;
+    gameStarted = true;
     Restart.click();
+    resultSaved = false;
 });
 
 document.getElementById('returnToMenu').addEventListener('click', () => {
     document.getElementById('gameOver').style.display = 'none';
     gameContainer.style.opacity = '1';
     isGameOver = false;
-    resultSaved = false;
+    isPaused = false;
+    gameStarted = false;
     Menu.click();
+    resultSaved = false;
 });
 
 // Update the gameOver and gameover_2 functions
@@ -968,15 +984,12 @@ async function saveGameResult(gameData) {
         // Format the game data properly
         const formattedData = {
             game_type: gameData.game_type,
-            player1: 1,
-            player2: 2,
-            player3: gameData.game_type === 'MP' ? 3 : null,
-            player4: gameData.game_type === 'MP' ? 4 : null,
+            players: gameData.game_type === 'MP' ? 4 : 2,
             player1_score: gameData.player1_score || 0,
             player2_score: gameData.player2_score || 0,
             player3_score: gameData.player3_score || 0,
             player4_score: gameData.player4_score || 0,
-            winner: parseInt(gameData.winner) || 'none'
+            winner: parseInt(gameData.winner) || 'none',
         };
 
         const response = await fetch('/save-game-result/', {
@@ -1054,4 +1067,4 @@ loop();
 
 
 // do samthing about data saving when the gameOver saving is not working ( there is a loop problem couseding the data to be saved multiple times)
-// adding local match making feature to the game
+// adding local matchmaking feature to the game

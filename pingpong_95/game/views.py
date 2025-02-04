@@ -9,7 +9,7 @@ def index(request):
 	return render(request, 'game/index.html')
 
 def game_results(request):
-	results = GameResult.objects.all().select_related('player1', 'player2', 'winner')
+	results = GameResult.objects.all().select_related('players', 'winner')
 	return render(request, 'game_results.html', {'game_results': results})
 
 @csrf_exempt
