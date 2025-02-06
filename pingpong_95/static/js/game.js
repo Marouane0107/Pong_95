@@ -69,89 +69,83 @@ function vector(x, y)
 
 
 document.querySelectorAll("button").forEach(button => {
-	QuitMenu.addEventListener('click', () => {
+    QuitMenu.addEventListener('click', () => {
 		// Try different approaches to close the window
-		if (window.opener) {
-			window.close();
-		} else {
-			window.location.href = 'about:blank';
-			window.close();
-		}
-	});
-	Player_vs_BOT.addEventListener('click', () => {
+        if (window.opener) {
+            window.close();
+        } else {
+            window.location.href = 'about:blank';
+            window.close();
+        }
+    });
+    Player_vs_BOT.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
-		landingPage.style.display = 'none';
-		gameContainer.style.display = 'flex';
-		gameStarted = true;
-		playerVSbot = true;
-		// Reset scores
-        player1.score = 0;
-        player2.score = 0;
-        document.getElementById("Player_1").innerHTML = "0";
-        document.getElementById("Player_2").innerHTML = "0";
-	});
-	Player_vs_Player.addEventListener('click', () => {
+        landingPage.style.display = 'none';
+        gameContainer.style.display = 'flex';
+        gameStarted = true;
+        playerVSbot = true;
+        // Reset scores
+            player1.score = 0;
+            player2.score = 0;
+            document.getElementById("Player_1").innerHTML = "0";
+            document.getElementById("Player_2").innerHTML = "0";
+    });
+    Player_vs_Player.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
-		landingPage.style.display = 'none';
-		gameContainer.style.display = 'flex';
-		gameStarted = true;
-		playerVSplayer = true;
-		// Reset scores
-        player1.score = 0;
-        player2.score = 0;
-        document.getElementById("Player_1").innerHTML = "0";
-        document.getElementById("Player_2").innerHTML = "0";
-	});
-	Multiplayer.addEventListener('click', () => {
+        landingPage.style.display = 'none';
+        gameContainer.style.display = 'flex';
+        gameStarted = true;
+        playerVSplayer = true;
+        // Reset scores
+            player1.score = 0;
+            player2.score = 0;
+            document.getElementById("Player_1").innerHTML = "0";
+            document.getElementById("Player_2").innerHTML = "0";
+    });
+    Multiplayer.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
-		landingPage.style.display = 'none';
-		gameContainer.style.display = 'flex';
-		document.getElementById("Player_3").style.display = 'block';
-		document.getElementById("Player_4").style.display = 'block';
-		document.getElementById("Name3").style.display = 'block';
-		document.getElementById("Name4").style.display = 'block';
-		gameStarted = true;
-		multiplayer = true;
-		// Reset all scores
-        player_1.score = 0;
-        player_2.score = 0;
-        player3.score = 0;
-        player4.score = 0;
-        document.getElementById("Player_1").innerHTML = "0";
-        document.getElementById("Player_2").innerHTML = "0";
-        document.getElementById("Player_3").innerHTML = "0";
-        document.getElementById("Player_4").innerHTML = "0";
-	});
-	Restart.addEventListener("click", () => {
+        landingPage.style.display = 'none';
+        gameContainer.style.display = 'flex';
+        document.getElementById("Player_3").style.display = 'block';
+        document.getElementById("Player_4").style.display = 'block';
+        document.getElementById("Name3").style.display = 'block';
+        document.getElementById("Name4").style.display = 'block';
+        gameStarted = true;
+        multiplayer = true;
+        // Reset all scores
+            player_1.score = 0;
+            player_2.score = 0;
+            player3.score = 0;
+            player4.score = 0;
+            document.getElementById("Player_1").innerHTML = "0";
+            document.getElementById("Player_2").innerHTML = "0";
+            document.getElementById("Player_3").innerHTML = "0";
+            document.getElementById("Player_4").innerHTML = "0";
+    });
+    Restart.addEventListener("click", () => {
         console.log("Restart button clicked");
-        saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
-		resetBall(ball);
+        // saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
+        resetBall(ball);
         setAlltoZero();
-	});
-	Menu.addEventListener("click", () => {
+    });
+    Menu.addEventListener("click", () => {
         resetBall(ball);
         console.log("Menu button clicked");
-		setAlltoZero();
-        saveInterruptedGame('Return to Menu before the game over');
-		landingPage.style.display = 'flex'; // Show landing page
-		gameContainer.style.display = 'none'; // Hide game container
-		document.getElementById("Player_3").style.display = 'none';
-		document.getElementById("Player_4").style.display = 'none';
-		document.getElementById("Name3").style.display = 'none';
-		document.getElementById("Name4").style.display = 'none';
-		gameStarted = false;
-		playerVSplayer = false;
-		playerVSbot = false;
-		multiplayer = false;
-	});
-    // Add window unload handler for browser close/refresh
-    window.addEventListener('beforeunload', (event) => {
-        if (gameStarted && !isGameOver) {
-            saveInterruptedGame('browser_close');
-        }
+        // saveInterruptedGame('Return to Menu before the game over');
+        setAlltoZero();
+        landingPage.style.display = 'flex'; // Show landing page
+        gameContainer.style.display = 'none'; // Hide game container
+        document.getElementById("Player_3").style.display = 'none';
+        document.getElementById("Player_4").style.display = 'none';
+        document.getElementById("Name3").style.display = 'none';
+        document.getElementById("Name4").style.display = 'none';
+        gameStarted = false;
+        playerVSplayer = false;
+        playerVSbot = false;
+        multiplayer = false;
     });
 });
 
@@ -408,19 +402,10 @@ function showGameOver(winner, score) {
     gameOverScreen.style.display = 'flex';
     gameContainer.style.opacity = '0.5';
     
-    // Format game data for saving
-    const gameData = {
-        game_type: playerVSbot ? 'PVB' : (multiplayer ? 'MP' : 'PVP'),
-        player1_score: multiplayer ? player_1.score : player1.score,
-        player2_score: multiplayer ? player_2.score : player2.score,
-        player3_score: multiplayer ? player3.score : 0,
-        player4_score: multiplayer ? player4.score : 0,
-        winner: winner.replace("Player ", "")
-    };
-    
-    if (resultSaved) return;  // Prevent duplicate saves
-    resultSaved = true;  // Mark as saved
-    saveGameResult(gameData);
+    if (!resultSaved) {
+        saveGameResult(winner);
+        resultSaved = true;
+    }
 }
 
 
@@ -976,36 +961,106 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-async function saveGameResult(gameData) {
-    // resultSaved = true;
-    try {
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-        // Format the game data properly
-        const formattedData = {
-            game_type: gameData.game_type,
-            players: gameData.game_type === 'MP' ? 4 : 2,
-            player1_score: gameData.player1_score || 0,
-            player2_score: gameData.player2_score || 0,
-            player3_score: gameData.player3_score || 0,
-            player4_score: gameData.player4_score || 0,
-            winner: parseInt(gameData.winner) || 'none',
-        };
-
-        const response = await fetch('/save-game-result/', {
+class GameAPI {
+    static async getGameResults() {
+        const response = await fetch('/api/games/');
+        return await response.json();
+    }
+    static async saveGameResult(gameData) {
+        const response = await fetch('/api/games/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
+                'X-CSRFToken': this.getCsrfToken(),
             },
-            body: JSON.stringify(formattedData),
+            body: JSON.stringify(gameData)
+        });
+        return await response.json();
+    }
+
+    static getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+}
+
+function getCsrfToken() {
+    // Try cookie first
+    const cookies = document.cookie.split(';');
+    const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
+    if (csrfCookie) {
+        return csrfCookie.split('=')[1];
+    }
+
+    // Fallback to meta tag
+    const metaToken = document.querySelector('meta[name="csrf-token"]');
+    if (metaToken) {
+        return metaToken.getAttribute('content');
+    }
+
+    console.error('CSRF token not found');
+    return null;
+}
+
+
+async function saveGameResult(winner) {
+    const csrfToken = getCsrfToken();
+    const gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
+
+    // Get player usernames from the DOM
+    const player1_username = document.getElementById('Name1').textContent;
+    const player2_username = document.getElementById('Name2').textContent;
+    const player3_username = document.getElementById('Name3').textContent;
+    const player4_username = document.getElementById('Name4').textContent;
+
+    const player1_score = player1.score;
+    const player2_score = player2.score;
+    const player3_score = player3.score;
+    const player4_score = player4.score;
+
+    // Determine the winner
+    let winnerNumber;
+    if (winner === "Player 1") {
+        winnerNumber = 1;
+    } else if (winner === "Player 2") {
+        winnerNumber = 2;
+    } else if (winner === "Player 3") {
+        winnerNumber = 3;
+    } else if (winner === "Player 4") {
+        winnerNumber = 4;
+    }
+
+    const data = {
+        game_type: gameType,
+        player1: player1_username,
+        player2: player2_username,
+        player3: player3_username,
+        player4: player4_username,
+        player1_score: player1_score,
+        player2_score: player2_score,
+        player3_score: player3_score,
+        player4_score: player4_score,
+        winner: winnerNumber
+    };
+
+    try {
+        const response = await fetch('/api/game-results/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
-        console.log('Game result saved successfully');
+
+        const result = await response.json();
+        console.log('Game result saved successfully:', result);
+        resultSaved = true;
+
     } catch (error) {
         console.error('Failed to save game result:', error);
     }
@@ -1045,7 +1100,7 @@ function saveInterruptedGame(reason) {
     if (hasScores || reason === 'browser_close') {
         console.log(`Game interrupted (${reason}):`, gameData);
         saveGameResult(gameData);
-    }
+            }
 }
 
 function loop()
@@ -1061,7 +1116,7 @@ function loop()
     }
     update();
     drawgame();
-}
+    }
 
 loop();
 

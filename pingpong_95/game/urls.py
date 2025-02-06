@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import save_game_result, index, game_results
+from .views import GameResultAPIView, SPAView
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('save-game-result/', save_game_result, name='save_game_result'),
-    path('game-results/', game_results, name='game_results'),
+    # SPA root view
+    path('', SPAView.as_view(), name='spa-root'),
+    
+    # API endpoints
+    path('api/game-results/', GameResultAPIView.as_view(), name='game_results'),
 ]

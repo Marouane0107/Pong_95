@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pong 95</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+    <script src="/static/js/game.js" defer></script>
+</head>
+<body>
+    {% csrf_token %}
+    <div id="app">
+        <!-- Landing Page -->
+        <div id="landingPage" class="game-screen">
+            <div id="title1">classic Ping Pong</div>
+            <h1 id="date">95</h1>
+            <h1 id="Welcome">Welcome to Ping Pong Game</h1>
+            <p>Enjoy the ultimate classic Ping Pong experience!</p>
+            <div class="button-container">
+                <div class="main-buttons">
+                    <button id="Player_vs_BOT">vs BOT</button>
+                    <button id="Player_vs_Player">vs Player</button>
+                    <button id="Multiplayer">Multiplayer</button>
+                    <button id="Matchmaking">Matchmaking</button>
+                    <button id="Tournament">Tournament</button>
+                </div>
+                <div class="quit-container">
+                    <button id="QuitMenu">Quit</button>
+                </div>
+            </div>
+        </div>
+        <!-- Game Container -->
+        <div id="gameContainer" class="game-screen">
+			<div id="head">
+				<h1 id="title">Pong 95</h1>
+				<div id="topFrame">
+					<div id="player1">
+						<h1 id="Name1">Player_1:</h1>
+						<h1 id="Player_1">${gameData.player1_score}</h1>
+					</div>
+					<div id="player3">
+						<h1 id="Name3">Player_3:</h1>
+						<h1 id="Player_3">${gameData.player3_score}</h1>
+					</div>
+					<div id="player4">
+						<h1 id="Name4">Player_4:</h1>
+						<h1 id="Player_4">${gameData.player4_score}</h1>
+					</div>
+					<div id="player2">
+						<h1 id="Name2">Player_2:</h1>
+						<h1 id="Player_2">${gameData.player2_score}</h1>
+					</div>
+				</div>
+			</div>
+            <canvas id="canvas1" width="800" height="500"></canvas>
+            <div id="tail">
+                <span>(c) maouzal 1337</span>
+                <div class="tail-buttons">
+                    <button id="Menu">Menu</button>
+                    <button id="Settings">Settings</button>
+                    <button id="Restart">Restart</button>
+                    <button id="Quit">Quit</button>
+                </div>
+            </div>
+        </div>
+        <!-- Settings Menu -->
+        <div id="settingsMenu" class="game-screen">
+            <h2>Settings</h2>
+            <div class="settings-content">
+                <div class="instructions">
+                    <h3>Controls:</h3>
+                    <p>Player 1: W/S keys</p>
+                    <p>Player 2: ↑/↓ arrows</p>
+                    <p>Player 3: G/H keys</p>
+                    <p>Player 4: 7/9 numpad</p>
+                    <p>ESC: Close settings</p>
+                </div>
+                <div class="setting-item">
+                    <label for="soundVolume">Sound Volume:</label>
+                    <input type="range" id="soundVolume" min="0" max="100" value="50">
+                </div>
+                <div class="setting-item">
+                    <label for="soundToggle">Sound Effects:</label>
+                    <input type="checkbox" id="soundToggle" checked>
+                </div>
+                <div class="settings-buttons">
+                    <button id="saveSettings">Save Settings</button>
+                    <button id="cancelSettings">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- Game Over Screen -->
+        <div id="gameOver" class="game-screen">
+            <h1 id="winnerText">Game Over</h1>
+            <div id="finalScore"></div>
+            <button id="playAgain">Play Again</button>
+            <button id="returnToMenu">Return to Menu</button>
+        </div>
+        
+    </div>
+    <!-- Preload audio files -->
+    <audio id="paddleHitSound" preload="auto">
+        <source src="/static/sounds/paddle_hit.wav" type="audio/wav">
+    </audio>
+    <audio id="scoreSound" preload="auto">
+        <source src="/static/sounds/score.wav" type="audio/wav">
+    </audio>
+</body>
+</html>
+
+<style>
+.game-screen {
+    display: none;
+}
+
+.game-screen.active {
+    display: block;
+}
+</style>
