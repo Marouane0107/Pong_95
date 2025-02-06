@@ -378,6 +378,8 @@ h1 {
     border-bottom: 2px solid #dfdfdf;
     font-size: 2rem;
     margin-bottom: 40px;
+    text-align: center;
+    line-height: 1.5;
 }
 
 /* Game Over Screen Button Styles */
@@ -582,4 +584,153 @@ h1 {
     position: absolute;
     bottom: 20px;
     right: 20px;
+}
+
+/* Tournament Modal Styles */
+#tournamentModal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    background-color: #bfbfbf;
+    border: 2px solid #c0c0c0;
+    border-top: 2px solid #dfdfdf;
+    border-left: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.tournament-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.player-registration {
+    display: flex;
+    gap: 10px;
+}
+
+#playerNameInput {
+    flex-grow: 1;
+    padding: 5px;
+    font-family: 'MS Sans Serif', sans-serif;
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+}
+
+.registered-players {
+    background-color: white;
+    border: 2px solid #808080;
+    padding: 10px;
+    min-height: 150px;
+}
+
+#playersList {
+    list-style: none;
+    padding: 0;
+}
+
+#playersList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    margin: 5px 0;
+    background-color: #efefef;
+}
+
+.tournament-bracket {
+    margin-top: 20px;
+}
+
+#bracketContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    background-color: white;
+    padding: 15px;
+    border: 2px solid #808080;
+}
+
+.match-pair {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #efefef;
+    margin: 5px 0;
+}
+
+#currentMatch {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #efefef;
+    border: 2px solid #808080;
+    text-align: center;
+}
+
+#nextMatchBtn {
+    background-color: #0078d7;
+    color: white;
+    width: 200px; /* Increased width */
+    height: 60px; /* Increased height */
+    font-size: 1.2rem;
+    border: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin: 15px 0;
+    text-align: center;
+}
+
+#nextMatchBtn:hover {
+    background-color: #21a1f1;
+}
+
+#nextMatchBtn:active {
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #ffffff;
+    transform: translateY(1px);
+}
+
+/* Update Tournament Modal Button Styles */
+#startMatchBtn,
+#startTournamentBtn,
+#cancelTournamentBtn {
+    width: 150px; /* Increased width */
+    height: 40px; /* Increased height */
+    margin: 5px;
+    font-size: 1rem;
+}
+
+.tournament-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Add Tournament winner announcement styles */
+#winnerText.tournament-winner {
+    font-size: 2.5rem;
+    color: #000080;
+    text-shadow: 2px 2px #ffffff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Update tournament modal button styles */
+#addPlayerBtn {
+    width: 120px;
+    height: 35px;
+    font-size: 0.9rem;
 }

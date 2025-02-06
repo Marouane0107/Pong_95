@@ -93,6 +93,35 @@
             <div id="finalScore"></div>
             <button id="playAgain">Play Again</button>
             <button id="returnToMenu">Return to Menu</button>
+            <button id="nextMatchBtn" style="display: none;">Next Match</button>
+        </div>
+
+        <!-- Tournament Modal -->
+        <div id="tournamentModal" class="game-screen">
+            <h2>Tournament Setup</h2>
+            <div class="tournament-setup">
+                <div class="player-registration">
+                    <input type="text" id="playerNameInput" placeholder="Enter player name">
+                    <button id="addPlayerBtn">Add Player</button>
+                </div>
+                <div class="registered-players">
+                    <h3>Registered Players</h3>
+                    <ul id="playersList"></ul>
+                </div>
+                <div class="tournament-controls">
+                    <button id="startTournamentBtn" disabled>Start Tournament</button>
+                    <button id="cancelTournamentBtn">Cancel</button>
+                </div>
+            </div>
+            <div class="tournament-bracket" style="display: none;">
+                <h3>Tournament Bracket</h3>
+                <div id="bracketContainer"></div>
+                <div id="currentMatch" style="display: none;">
+                    <h4>Current Match</h4>
+                    <p><span id="player1Name"></span> vs <span id="player2Name"></span></p>
+                    <button id="startMatchBtn">Start Match</button>
+                </div>
+            </div>
         </div>
         
     </div>

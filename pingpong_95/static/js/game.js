@@ -396,11 +396,53 @@ function showGameOver(winner, score) {
     const gameOverScreen = document.getElementById('gameOver');
     const finalScore = document.getElementById('finalScore');
     const winnerText = document.getElementById('winnerText');
+    const playAgainBtn = document.getElementById('playAgain');
+    const returnToMenuBtn = document.getElementById('returnToMenu');
+    const nextMatchBtn = document.getElementById('nextMatchBtn');
     
-    winnerText.textContent = `${winner} Wins!`;
-    finalScore.textContent = `Final Score: ${score}`;
+    if (tournament.isActive) {
+        playAgainBtn.style.display = 'none';
+        returnToMenuBtn.style.display = 'none';
+        nextMatchBtn.style.display = 'block';
+        
+        // Add winner to tournament progress
+        tournament.roundWinners.push(winner);
+        
+        if (tournament.roundWinners.length === 2) {
+            // Create final match
+            tournament.matches.push({
+                round: 2,
+                player1: tournament.roundWinners[0],
+                player2: tournament.roundWinners[1]
+            });
+        }
+
+        if (tournament.roundWinners.length === 3) {
+            // Tournament is complete
+            winnerText.textContent = `Tournament Winner: ${winner}!`;
+            finalScore.textContent = `Congratulations!`;
+            nextMatchBtn.textContent = 'Return to Menu';
+            tournament.isActive = false;
+        } else {
+            // More matches to play
+            tournament.currentMatchIndex++;
+            const nextMatch = tournament.matches[tournament.currentMatchIndex];
+            winnerText.textContent = `${winner} wins this match!`;
+            finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
+            nextMatchBtn.textContent = 'Next Match';
+        }
+    } else {
+        // Regular game ended
+        winnerText.textContent = `${winner} Wins!`;
+        finalScore.textContent = `Final Score: ${score}`;
+        playAgainBtn.style.display = 'block';
+        returnToMenuBtn.style.display = 'block';
+        nextMatchBtn.style.display = 'none';
+    }
+    
     gameOverScreen.style.display = 'flex';
     gameContainer.style.opacity = '0.5';
+    updateBracketDisplay();
     
     if (!resultSaved) {
         saveGameResult(winner);
@@ -1123,3 +1165,287 @@ loop();
 
 // do samthing about data saving when the gameOver saving is not working ( there is a loop problem couseding the data to be saved multiple times)
 // adding local matchmaking feature to the game
+
+// Tournament Management
+const tournament = {
+    players: [],
+    matches: [],
+    currentMatchIndex: 0,
+    isActive: false,
+    roundWinners: []  // Track winners of each round
+};
+
+// Event Listeners
+document.getElementById('Tournament').addEventListener('click', () => {
+    document.getElementById('tournamentModal').style.display = 'block';
+    landingPage.style.display = 'none';
+});
+
+document.getElementById('addPlayerBtn').addEventListener('click', () => {
+    const input = document.getElementById('playerNameInput');
+    const name = input.value.trim();
+    
+    if (name && tournament.players.length < 4) { // Max 4 players
+        tournament.players.push(name);
+        updatePlayersList();
+        input.value = '';
+        
+        // Enable start button only when we have exactly 4 players
+        document.getElementById('startTournamentBtn').disabled = tournament.players.length !== 4;
+        
+        // Disable add button if max players reached
+        if (tournament.players.length >= 4) {
+            document.getElementById('addPlayerBtn').disabled = true;
+        }
+    }
+});
+
+document.getElementById('startTournamentBtn').addEventListener('click', () => {
+    if (tournament.players.length >= 4) {
+        initializeTournament();
+        document.querySelector('.tournament-setup').style.display = 'none';
+        document.querySelector('.tournament-bracket').style.display = 'block';
+    }
+});
+
+document.getElementById('cancelTournamentBtn').addEventListener('click', () => {
+    document.getElementById('tournamentModal').style.display = 'none';
+    landingPage.style.display = 'flex';
+    resetTournament();
+});
+
+document.getElementById('startMatchBtn').addEventListener('click', () => {
+    const currentMatch = tournament.matches[tournament.currentMatchIndex];
+    if (currentMatch) {
+        startTournamentMatch(currentMatch.player1, currentMatch.player2);
+    }
+});
+
+document.getElementById('nextMatchBtn').addEventListener('click', () => {
+    document.getElementById('gameOver').style.display = 'none';
+    gameContainer.style.opacity = '1';
+    
+    if (!tournament.isActive) {
+        // Tournament is complete, return to menu
+        resetTournament();
+        document.getElementById('tournamentModal').style.display = 'none';
+        gameContainer.style.display = 'none';
+        landingPage.style.display = 'flex';
+    } else if (tournament.roundWinners.length === 2) {
+        // Start final match
+        startTournamentMatch(tournament.roundWinners[0], tournament.roundWinners[1]);
+    } else {
+        // Start next semi-final match
+        const nextMatch = tournament.matches[tournament.currentMatchIndex];
+        if (nextMatch) {
+            startTournamentMatch(nextMatch.player1, nextMatch.player2);
+        }
+    }
+});
+
+// Helper Functions
+function updatePlayersList() {
+    const list = document.getElementById('playersList');
+    list.innerHTML = '';
+    
+    tournament.players.forEach((player, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${player}`;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => {
+            tournament.players.splice(index, 1);
+            updatePlayersList();
+            // Re-enable add button if below max
+            document.getElementById('addPlayerBtn').disabled = tournament.players.length >= 4;
+            // Update start button based on valid player count
+            const validPlayerCount = [4, 6, 8].includes(tournament.players.length);
+            document.getElementById('startTournamentBtn').disabled = !validPlayerCount;
+        };
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+    });
+}
+
+function initializeTournament() {
+    tournament.isActive = true;
+    tournament.currentMatchIndex = 0;
+    tournament.matches = [];
+    tournament.roundWinners = [];
+    
+    // Create semi-final matches (always 2 matches)
+    tournament.matches = [
+        {
+            round: 1,
+            player1: tournament.players[0],
+            player2: tournament.players[1]
+        },
+        {
+            round: 1,
+            player1: tournament.players[2],
+            player2: tournament.players[3]
+        }
+    ];
+    
+    updateBracketDisplay();
+    showCurrentMatch();
+}
+
+function showCurrentMatch() {
+    const currentMatch = tournament.matches[tournament.currentMatchIndex];
+    if (currentMatch) {
+        document.getElementById('currentMatch').style.display = 'block';
+        document.getElementById('player1Name').textContent = currentMatch.player1;
+        document.getElementById('player2Name').textContent = currentMatch.player2;
+        
+        // Also update the game display names
+        document.getElementById('Name1').textContent = currentMatch.player1;
+        document.getElementById('Name2').textContent = currentMatch.player2;
+    }
+}
+
+function resetTournament() {
+    tournament.isActive = false;
+    tournament.currentMatchIndex = 0;
+    tournament.players = [];
+    tournament.matches = [];
+    tournament.roundWinners = [];
+    document.getElementById('startTournamentBtn').disabled = true;
+    document.getElementById('addPlayerBtn').disabled = false;
+    document.getElementById('playersList').innerHTML = '';
+    document.getElementById('currentMatch').style.display = 'none';
+    document.getElementById('bracketContainer').innerHTML = '';
+    document.querySelector('.tournament-setup').style.display = 'block';
+    document.querySelector('.tournament-bracket').style.display = 'none';
+}
+
+function startTournamentMatch(player1Name, player2Name) {
+    document.getElementById('tournamentModal').style.display = 'none';
+    gameContainer.style.display = 'flex';
+    gameStarted = true;
+    playerVSplayer = true;
+    isGameOver = false;
+    isPaused = false;
+    
+    // Ensure player names are strings
+    const name1 = String(player1Name);
+    const name2 = String(player2Name);
+    
+    // Update player names
+    document.getElementById('Name1').textContent = name1;
+    document.getElementById('Name2').textContent = name2;
+    
+    // Reset scores and positions
+    player1.score = 0;
+    player2.score = 0;
+    document.getElementById('Player_1').innerHTML = '0';
+    document.getElementById('Player_2').innerHTML = '0';
+    
+    resetBall(ball);
+    resetPosition(player1, player2);
+    
+    // Store the current match players for reference
+    tournament.currentPlayers = {
+        player1: name1,
+        player2: name2
+    };
+}
+
+function showGameOver(winner, score) {
+    isPaused = true;
+    
+    const gameOverScreen = document.getElementById('gameOver');
+    const finalScore = document.getElementById('finalScore');
+    const winnerText = document.getElementById('winnerText');
+    const playAgainBtn = document.getElementById('playAgain');
+    const returnToMenuBtn = document.getElementById('returnToMenu');
+    const nextMatchBtn = document.getElementById('nextMatchBtn');
+    
+    if (tournament.isActive) {
+        playAgainBtn.style.display = 'none';
+        returnToMenuBtn.style.display = 'none';
+        nextMatchBtn.style.display = 'block';
+        
+        // Add winner to tournament progress
+        tournament.roundWinners.push(winner);
+        
+        if (tournament.roundWinners.length === 2) {
+            // Create final match
+            tournament.matches.push({
+                round: 2,
+                player1: tournament.roundWinners[0],
+                player2: tournament.roundWinners[1]
+            });
+        }
+
+        if (tournament.roundWinners.length === 3) {
+            // Tournament is complete
+            winnerText.textContent = `Tournament Winner: ${winner}!`;
+            finalScore.textContent = `Congratulations!`;
+            nextMatchBtn.textContent = 'Return to Menu';
+            tournament.isActive = false;
+        } else {
+            // More matches to play
+            tournament.currentMatchIndex++;
+            const nextMatch = tournament.matches[tournament.currentMatchIndex];
+            winnerText.textContent = `${winner} wins this match!`;
+            finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
+            nextMatchBtn.textContent = 'Next Match';
+        }
+    } else {
+        // Regular game ended
+        winnerText.textContent = `${winner} Wins!`;
+        finalScore.textContent = `Final Score: ${score}`;
+        playAgainBtn.style.display = 'block';
+        returnToMenuBtn.style.display = 'block';
+        nextMatchBtn.style.display = 'none';
+    }
+    
+    gameOverScreen.style.display = 'flex';
+    gameContainer.style.opacity = '0.5';
+    updateBracketDisplay();
+    
+    if (!resultSaved) {
+        saveGameResult(winner);
+        resultSaved = true;
+    }
+}
+
+function updateBracketDisplay() {
+    const container = document.getElementById('bracketContainer');
+    container.innerHTML = '';
+    
+    // Display semi-finals matches
+    const round1Div = document.createElement('div');
+    round1Div.className = 'tournament-round';
+    round1Div.innerHTML = '<h3>Semi-Finals</h3>';
+    
+    // Display first round/semi-final matches
+    tournament.matches.forEach((match) => {
+        if (match.round === 1) {
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'match-pair';
+            matchDiv.innerHTML = `${match.player1} vs ${match.player2}`;
+            round1Div.appendChild(matchDiv);
+        }
+    });
+    container.appendChild(round1Div);
+
+    // Display finals if we have enough winners
+    if (tournament.roundWinners.length >= 2) {
+        const finalsDiv = document.createElement('div');
+        finalsDiv.className = 'tournament-round';
+        finalsDiv.innerHTML = '<h3>Finals</h3>';
+        finalsDiv.innerHTML += `<div class="match-pair">Final: ${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}</div>`;
+        container.appendChild(finalsDiv);
+    }
+
+    // Display winner if tournament is complete
+    if (tournament.roundWinners.length === 3) {
+        const winnerDiv = document.createElement('div');
+        winnerDiv.className = 'tournament-round';
+        winnerDiv.innerHTML = '<h3>Tournament Champion</h3>';
+        winnerDiv.innerHTML += `<div class="match-pair winner">${tournament.roundWinners[2]}</div>`;
+        container.appendChild(winnerDiv);
+    }
+}
