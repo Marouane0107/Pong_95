@@ -136,6 +136,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import logging
 
+logging.getLogger('django.request').addFilter(
+    lambda record: not record.getMessage().startswith("Not Found: /favicon.ico")
+)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

@@ -81,6 +81,7 @@ document.querySelectorAll("button").forEach(button => {
     Player_vs_BOT.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
+        isPaused = false;
         landingPage.style.display = 'none';
         gameContainer.style.display = 'flex';
         gameStarted = true;
@@ -90,10 +91,14 @@ document.querySelectorAll("button").forEach(button => {
             player2.score = 0;
             document.getElementById("Player_1").innerHTML = "0";
             document.getElementById("Player_2").innerHTML = "0";
+        // Set Name for Player 1 and Player 2
+            document.getElementById("Name1").innerHTML = "Player";
+            document.getElementById("Name2").innerHTML = "BOT";
     });
     Player_vs_Player.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
+        isPaused = false;
         landingPage.style.display = 'none';
         gameContainer.style.display = 'flex';
         gameStarted = true;
@@ -103,10 +108,14 @@ document.querySelectorAll("button").forEach(button => {
             player2.score = 0;
             document.getElementById("Player_1").innerHTML = "0";
             document.getElementById("Player_2").innerHTML = "0";
+        // Set Name for Player 1 and Player 2
+            document.getElementById("Name1").innerHTML = "Player_1";
+            document.getElementById("Name2").innerHTML = "Player_2";
     });
     Multiplayer.addEventListener('click', () => {
 		initializeAudio();
         resultSaved = false;
+        isPaused = false;
         landingPage.style.display = 'none';
         gameContainer.style.display = 'flex';
         document.getElementById("Player_3").style.display = 'block';
@@ -124,6 +133,11 @@ document.querySelectorAll("button").forEach(button => {
             document.getElementById("Player_2").innerHTML = "0";
             document.getElementById("Player_3").innerHTML = "0";
             document.getElementById("Player_4").innerHTML = "0";
+        // Set Name for Player 1, Player 2, Player 3 and Player 4
+            document.getElementById("Name1").innerHTML = "Player_1";
+            document.getElementById("Name2").innerHTML = "Player_2";
+            document.getElementById("Name3").innerHTML = "Player_3";
+            document.getElementById("Name4").innerHTML = "Player_4";
     });
     Restart.addEventListener("click", () => {
         console.log("Restart button clicked");
@@ -390,65 +404,6 @@ function resetPosition(player1, player2) {
     player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
 }
 
-function showGameOver(winner, score) {
-    isPaused = true;
-    
-    const gameOverScreen = document.getElementById('gameOver');
-    const finalScore = document.getElementById('finalScore');
-    const winnerText = document.getElementById('winnerText');
-    const playAgainBtn = document.getElementById('playAgain');
-    const returnToMenuBtn = document.getElementById('returnToMenu');
-    const nextMatchBtn = document.getElementById('nextMatchBtn');
-    
-    if (tournament.isActive) {
-        playAgainBtn.style.display = 'none';
-        returnToMenuBtn.style.display = 'none';
-        nextMatchBtn.style.display = 'block';
-        
-        // Add winner to tournament progress
-        tournament.roundWinners.push(winner);
-        
-        if (tournament.roundWinners.length === 2) {
-            // Create final match
-            tournament.matches.push({
-                round: 2,
-                player1: tournament.roundWinners[0],
-                player2: tournament.roundWinners[1]
-            });
-        }
-
-        if (tournament.roundWinners.length === 3) {
-            // Tournament is complete
-            winnerText.textContent = `Tournament Winner: ${winner}!`;
-            finalScore.textContent = `Congratulations!`;
-            nextMatchBtn.textContent = 'Return to Menu';
-            tournament.isActive = false;
-        } else {
-            // More matches to play
-            tournament.currentMatchIndex++;
-            const nextMatch = tournament.matches[tournament.currentMatchIndex];
-            winnerText.textContent = `${winner} wins this match!`;
-            finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
-            nextMatchBtn.textContent = 'Next Match';
-        }
-    } else {
-        // Regular game ended
-        winnerText.textContent = `${winner} Wins!`;
-        finalScore.textContent = `Final Score: ${score}`;
-        playAgainBtn.style.display = 'block';
-        returnToMenuBtn.style.display = 'block';
-        nextMatchBtn.style.display = 'none';
-    }
-    
-    gameOverScreen.style.display = 'flex';
-    gameContainer.style.opacity = '0.5';
-    updateBracketDisplay();
-    
-    if (!resultSaved) {
-        saveGameResult(winner);
-        resultSaved = true;
-    }
-}
 
 
 document.getElementById('playAgain').addEventListener('click', () => {
@@ -1047,7 +1002,14 @@ function getCsrfToken() {
 
 async function saveGameResult(winner) {
     const csrfToken = getCsrfToken();
-    const gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
+
+    const isTournamentFinal = tournament.isActive && tournament.roundWinners.length === 3;
+    let gameType;
+    if (tournament.isActive) {
+        gameType = 'TRN';  // Tournament game
+    } else {
+        gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
+    }
 
     // Get player usernames from the DOM
     const player1_username = document.getElementById('Name1').textContent;
@@ -1072,6 +1034,12 @@ async function saveGameResult(winner) {
         winnerNumber = 4;
     }
 
+    // Determine tournament round
+    let tournamentRound = null;
+    if (tournament.isActive || isTournamentFinal) {
+        tournamentRound = tournament.roundWinners.length <= 2 ? 1 : 2;
+    }
+
     const data = {
         game_type: gameType,
         player1: player1_username,
@@ -1082,7 +1050,9 @@ async function saveGameResult(winner) {
         player2_score: player2_score,
         player3_score: player3_score,
         player4_score: player4_score,
-        winner: winnerNumber
+        winner: winnerNumber,
+        is_tournament_match: Boolean(tournament.isActive || isTournamentFinal),
+        tournament_round: tournamentRound
     };
 
     try {
@@ -1259,7 +1229,7 @@ function updatePlayersList() {
             // Re-enable add button if below max
             document.getElementById('addPlayerBtn').disabled = tournament.players.length >= 4;
             // Update start button based on valid player count
-            const validPlayerCount = [4, 6, 8].includes(tournament.players.length);
+            const validPlayerCount = [4].includes(tournament.players.length);
             document.getElementById('startTournamentBtn').disabled = !validPlayerCount;
         };
         li.appendChild(removeBtn);
@@ -1326,11 +1296,12 @@ function startTournamentMatch(player1Name, player2Name) {
     playerVSplayer = true;
     isGameOver = false;
     isPaused = false;
+    resultSaved = false;
     
     // Ensure player names are strings
     const name1 = String(player1Name);
     const name2 = String(player2Name);
-    
+
     // Update player names
     document.getElementById('Name1').textContent = name1;
     document.getElementById('Name2').textContent = name2;
@@ -1351,6 +1322,58 @@ function startTournamentMatch(player1Name, player2Name) {
     };
 }
 
+function updateBracketDisplay() {
+    const container = document.getElementById('bracketContainer');
+    container.innerHTML = '';
+    
+    // Display semi-finals matches
+    const round1Div = document.createElement('div');
+    round1Div.className = 'tournament-round';
+    round1Div.innerHTML = '<h3>Semi-Finals</h3>';
+    
+    // Display first round/semi-final matches with winners highlighted
+    tournament.matches.forEach((match, index) => {
+        if (match.round === 1) {
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'match-pair';
+            let matchText = `${match.player1} vs ${match.player2}`;
+            
+            // Highlight winner if there is one
+            if (tournament.roundWinners[index]) {
+                matchText += ` (Winner: ${tournament.roundWinners[index]})`;
+            }
+            
+            matchDiv.innerHTML = matchText;
+            round1Div.appendChild(matchDiv);
+        }
+    });
+    container.appendChild(round1Div);
+
+    // Display finals if we have both semi-final winners
+    if (tournament.roundWinners.length >= 2) {
+        const finalsDiv = document.createElement('div');
+        finalsDiv.className = 'tournament-round';
+        finalsDiv.innerHTML = '<h3>Finals</h3>';
+        
+        // Create finals match display
+        let finalsText = `${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
+        if (tournament.roundWinners.length === 3) {
+            finalsText += ` (Winner: ${tournament.roundWinners[2]})`;
+        }
+        finalsDiv.innerHTML += `<div class="match-pair">${finalsText}</div>`;
+        container.appendChild(finalsDiv);
+    }
+
+    // Display tournament champion if we have one
+    if (tournament.roundWinners.length === 3) {
+        const winnerDiv = document.createElement('div');
+        winnerDiv.className = 'tournament-round';
+        winnerDiv.innerHTML = '<h3>Tournament Champion</h3>';
+        winnerDiv.innerHTML += `<div class="match-pair winner">${tournament.roundWinners[2]}</div>`;
+        container.appendChild(winnerDiv);
+    }
+}
+
 function showGameOver(winner, score) {
     isPaused = true;
     
@@ -1362,12 +1385,16 @@ function showGameOver(winner, score) {
     const nextMatchBtn = document.getElementById('nextMatchBtn');
     
     if (tournament.isActive) {
+        resultSaved = false;
         playAgainBtn.style.display = 'none';
         returnToMenuBtn.style.display = 'none';
         nextMatchBtn.style.display = 'block';
         
         // Add winner to tournament progress
-        tournament.roundWinners.push(winner);
+        // Make sure we're using the correct player name from the current match
+        const currentMatch = tournament.matches[tournament.currentMatchIndex];
+        const winnerName = winner === "Player 1" ? currentMatch.player1 : currentMatch.player2;
+        tournament.roundWinners.push(winnerName); // Use the actual player name
         
         if (tournament.roundWinners.length === 2) {
             // Create final match
@@ -1376,22 +1403,39 @@ function showGameOver(winner, score) {
                 player1: tournament.roundWinners[0],
                 player2: tournament.roundWinners[1]
             });
-        }
-
-        if (tournament.roundWinners.length === 3) {
+            winnerText.textContent = `${winnerName} wins this match!`;
+            finalScore.innerHTML = `Finals Match:<br>${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
+            nextMatchBtn.textContent = 'Start Finals';
+            if (!resultSaved) {
+                saveGameResult(winner);
+                resultSaved = true;
+            }
+        } else if (tournament.roundWinners.length === 3) {
             // Tournament is complete
-            winnerText.textContent = `Tournament Winner: ${winner}!`;
+            winnerText.textContent = `Tournament Champion: ${winnerName}!`;
             finalScore.textContent = `Congratulations!`;
             nextMatchBtn.textContent = 'Return to Menu';
+            if (!resultSaved) {
+                saveGameResult(winner);
+                resultSaved = true;
+            }
             tournament.isActive = false;
+            // isPaused = false;
         } else {
             // More matches to play
             tournament.currentMatchIndex++;
             const nextMatch = tournament.matches[tournament.currentMatchIndex];
-            winnerText.textContent = `${winner} wins this match!`;
+            winnerText.textContent = `${winnerName} wins this match!`;
             finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
             nextMatchBtn.textContent = 'Next Match';
+            if (!resultSaved) {
+                saveGameResult(winner);
+                resultSaved = true;
+            }
         }
+
+        // Update the bracket display immediately after updating winners
+        updateBracketDisplay();
     } else {
         // Regular game ended
         winnerText.textContent = `${winner} Wins!`;
@@ -1403,49 +1447,9 @@ function showGameOver(winner, score) {
     
     gameOverScreen.style.display = 'flex';
     gameContainer.style.opacity = '0.5';
-    updateBracketDisplay();
     
-    if (!resultSaved) {
+    if (!tournament.isActive && !resultSaved) {
         saveGameResult(winner);
         resultSaved = true;
-    }
-}
-
-function updateBracketDisplay() {
-    const container = document.getElementById('bracketContainer');
-    container.innerHTML = '';
-    
-    // Display semi-finals matches
-    const round1Div = document.createElement('div');
-    round1Div.className = 'tournament-round';
-    round1Div.innerHTML = '<h3>Semi-Finals</h3>';
-    
-    // Display first round/semi-final matches
-    tournament.matches.forEach((match) => {
-        if (match.round === 1) {
-            const matchDiv = document.createElement('div');
-            matchDiv.className = 'match-pair';
-            matchDiv.innerHTML = `${match.player1} vs ${match.player2}`;
-            round1Div.appendChild(matchDiv);
-        }
-    });
-    container.appendChild(round1Div);
-
-    // Display finals if we have enough winners
-    if (tournament.roundWinners.length >= 2) {
-        const finalsDiv = document.createElement('div');
-        finalsDiv.className = 'tournament-round';
-        finalsDiv.innerHTML = '<h3>Finals</h3>';
-        finalsDiv.innerHTML += `<div class="match-pair">Final: ${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}</div>`;
-        container.appendChild(finalsDiv);
-    }
-
-    // Display winner if tournament is complete
-    if (tournament.roundWinners.length === 3) {
-        const winnerDiv = document.createElement('div');
-        winnerDiv.className = 'tournament-round';
-        winnerDiv.innerHTML = '<h3>Tournament Champion</h3>';
-        winnerDiv.innerHTML += `<div class="match-pair winner">${tournament.roundWinners[2]}</div>`;
-        container.appendChild(winnerDiv);
     }
 }
