@@ -734,3 +734,64 @@ h1 {
     height: 35px;
     font-size: 0.9rem;
 }
+
+/* Windows 95 style input validation */
+#playerNameInput.invalid {
+    border: 2px solid;
+    border-color: #000000 #ffffff #ffffff #000000;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+#playerNameInput.duplicate {
+    border: 2px solid;
+    border-color: #000000 #ffffff #ffffff #000000;
+    background-color: #ffffff;
+    /* Windows 95 used black text on white background for inputs */
+    color: #000000;
+}
+
+/* Add a small red 'X' icon or asterisk next to invalid input - Windows 95 style */
+#playerNameInput.invalid::after,
+#playerNameInput.duplicate::after {
+    content: '*';
+    color: #ff0000;
+    margin-left: 5px;
+    font-family: 'MS Sans Serif', sans-serif;
+}
+
+/* Windows 95 focus style */
+#playerNameInput:focus {
+    border: 2px solid;
+    border-color: #000000 #dfdfdf #dfdfdf #000000;
+    outline: none;
+}
+
+/* Add styles for the remove button */
+.remove-btn {
+    width: 100px;
+    height: 35px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.remove-btn:active {
+    border: 2px solid #808080;
+    border-right: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #ffffff;
+    transform: translateY(1px);
+}
+
+/* Adjust styles for the list items */
+#playersList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    margin: 5px 0;
+    background-color: #efefef;
+    font-family: 'MS Sans Serif', sans-serif;
+    font-size: 1rem;
+}

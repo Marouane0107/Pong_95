@@ -62,463 +62,463 @@ window.addEventListener('keyup', function(e) {
 	keysPressed[e.keyCode] = false;
 });
 
-function vector(x, y) 
+function vector(x, y)
 {
 	return { x: x, y: y };
 }
 
 
 document.querySelectorAll("button").forEach(button => {
-    QuitMenu.addEventListener('click', () => {
+	QuitMenu.addEventListener('click', () => {
 		// Try different approaches to close the window
-        if (window.opener) {
-            window.close();
-        } else {
-            window.location.href = 'about:blank';
-            window.close();
-        }
-    });
-    Player_vs_BOT.addEventListener('click', () => {
+		if (window.opener) {
+			window.close();
+		} else {
+			window.location.href = 'about:blank';
+			window.close();
+		}
+	});
+	Player_vs_BOT.addEventListener('click', () => {
 		initializeAudio();
-        resultSaved = false;
-        isPaused = false;
-        landingPage.style.display = 'none';
-        gameContainer.style.display = 'flex';
-        gameStarted = true;
-        playerVSbot = true;
-        // Reset scores
-            player1.score = 0;
-            player2.score = 0;
-            document.getElementById("Player_1").innerHTML = "0";
-            document.getElementById("Player_2").innerHTML = "0";
-        // Set Name for Player 1 and Player 2
-            document.getElementById("Name1").innerHTML = "Player";
-            document.getElementById("Name2").innerHTML = "BOT";
-    });
-    Player_vs_Player.addEventListener('click', () => {
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		gameStarted = true;
+		playerVSbot = true;
+		// Reset scores
+			player1.score = 0;
+			player2.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+		// Set Name for Player 1 and Player 2
+			document.getElementById("Name1").innerHTML = "Player";
+			document.getElementById("Name2").innerHTML = "BOT";
+	});
+	Player_vs_Player.addEventListener('click', () => {
 		initializeAudio();
-        resultSaved = false;
-        isPaused = false;
-        landingPage.style.display = 'none';
-        gameContainer.style.display = 'flex';
-        gameStarted = true;
-        playerVSplayer = true;
-        // Reset scores
-            player1.score = 0;
-            player2.score = 0;
-            document.getElementById("Player_1").innerHTML = "0";
-            document.getElementById("Player_2").innerHTML = "0";
-        // Set Name for Player 1 and Player 2
-            document.getElementById("Name1").innerHTML = "Player_1";
-            document.getElementById("Name2").innerHTML = "Player_2";
-    });
-    Multiplayer.addEventListener('click', () => {
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		gameStarted = true;
+		playerVSplayer = true;
+		// Reset scores
+			player1.score = 0;
+			player2.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+		// Set Name for Player 1 and Player 2
+			document.getElementById("Name1").innerHTML = "Player_1";
+			document.getElementById("Name2").innerHTML = "Player_2";
+	});
+	Multiplayer.addEventListener('click', () => {
 		initializeAudio();
-        resultSaved = false;
-        isPaused = false;
-        landingPage.style.display = 'none';
-        gameContainer.style.display = 'flex';
-        document.getElementById("Player_3").style.display = 'block';
-        document.getElementById("Player_4").style.display = 'block';
-        document.getElementById("Name3").style.display = 'block';
-        document.getElementById("Name4").style.display = 'block';
-        gameStarted = true;
-        multiplayer = true;
-        // Reset all scores
-            player_1.score = 0;
-            player_2.score = 0;
-            player3.score = 0;
-            player4.score = 0;
-            document.getElementById("Player_1").innerHTML = "0";
-            document.getElementById("Player_2").innerHTML = "0";
-            document.getElementById("Player_3").innerHTML = "0";
-            document.getElementById("Player_4").innerHTML = "0";
-        // Set Name for Player 1, Player 2, Player 3 and Player 4
-            document.getElementById("Name1").innerHTML = "Player_1";
-            document.getElementById("Name2").innerHTML = "Player_2";
-            document.getElementById("Name3").innerHTML = "Player_3";
-            document.getElementById("Name4").innerHTML = "Player_4";
-    });
-    Restart.addEventListener("click", () => {
-        console.log("Restart button clicked");
-        // saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
-        resetBall(ball);
-        setAlltoZero();
-    });
-    Menu.addEventListener("click", () => {
-        resetBall(ball);
-        console.log("Menu button clicked");
-        // saveInterruptedGame('Return to Menu before the game over');
-        setAlltoZero();
-        landingPage.style.display = 'flex'; // Show landing page
-        gameContainer.style.display = 'none'; // Hide game container
-        document.getElementById("Player_3").style.display = 'none';
-        document.getElementById("Player_4").style.display = 'none';
-        document.getElementById("Name3").style.display = 'none';
-        document.getElementById("Name4").style.display = 'none';
-        gameStarted = false;
-        playerVSplayer = false;
-        playerVSbot = false;
-        multiplayer = false;
-    });
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		document.getElementById("Player_3").style.display = 'block';
+		document.getElementById("Player_4").style.display = 'block';
+		document.getElementById("Name3").style.display = 'block';
+		document.getElementById("Name4").style.display = 'block';
+		gameStarted = true;
+		multiplayer = true;
+		// Reset all scores
+			player_1.score = 0;
+			player_2.score = 0;
+			player3.score = 0;
+			player4.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+			document.getElementById("Player_3").innerHTML = "0";
+			document.getElementById("Player_4").innerHTML = "0";
+		// Set Name for Player 1, Player 2, Player 3 and Player 4
+			document.getElementById("Name1").innerHTML = "Player_1";
+			document.getElementById("Name2").innerHTML = "Player_2";
+			document.getElementById("Name3").innerHTML = "Player_3";
+			document.getElementById("Name4").innerHTML = "Player_4";
+	});
+	Restart.addEventListener("click", () => {
+		console.log("Restart button clicked");
+		// saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
+		resetBall(ball);
+		setAlltoZero();
+	});
+	Menu.addEventListener("click", () => {
+		resetBall(ball);
+		console.log("Menu button clicked");
+		// saveInterruptedGame('Return to Menu before the game over');
+		setAlltoZero();
+		landingPage.style.display = 'flex'; // Show landing page
+		gameContainer.style.display = 'none'; // Hide game container
+		document.getElementById("Player_3").style.display = 'none';
+		document.getElementById("Player_4").style.display = 'none';
+		document.getElementById("Name3").style.display = 'none';
+		document.getElementById("Name4").style.display = 'none';
+		gameStarted = false;
+		playerVSplayer = false;
+		playerVSbot = false;
+		multiplayer = false;
+	});
 });
 
 function setAlltoZero() {
-    if (multiplayer) {
-        resetPosition_2(player_1, player_2, player3, player4);
-        player_1.score = 0;
-        player_2.score = 0;
-        player3.score = 0;
-        player4.score = 0;
-        document.getElementById("Player_1").innerHTML = player_1.score;
-        document.getElementById("Player_2").innerHTML = player_2.score;
-        document.getElementById("Player_3").innerHTML = player3.score;
-        document.getElementById("Player_4").innerHTML = player4.score;
-    } else {
-        resetPosition(player1, player2);
-        player1.score = 0;
-        player2.score = 0;
-        document.getElementById("Player_1").innerHTML = player1.score;
-        document.getElementById("Player_2").innerHTML = player2.score;
-    }
+	if (multiplayer) {
+		resetPosition_2(player_1, player_2, player3, player4);
+		player_1.score = 0;
+		player_2.score = 0;
+		player3.score = 0;
+		player4.score = 0;
+		document.getElementById("Player_1").innerHTML = player_1.score;
+		document.getElementById("Player_2").innerHTML = player_2.score;
+		document.getElementById("Player_3").innerHTML = player3.score;
+		document.getElementById("Player_4").innerHTML = player4.score;
+	} else {
+		resetPosition(player1, player2);
+		player1.score = 0;
+		player2.score = 0;
+		document.getElementById("Player_1").innerHTML = player1.score;
+		document.getElementById("Player_2").innerHTML = player2.score;
+	}
 }
 
 // Pre-create audio buffers and sources
 const audioSources = {
-    paddle: [],
-    score: []
+	paddle: [],
+	score: []
 };
 
 // Initialize audio with just paddle and score sounds
 async function initializeAudio() {
-    if (window.audioInitialized) return;
+	if (window.audioInitialized) return;
 
-    try {
-        // Pre-create nodes only for paddle and score
-        for (const type of ['paddle', 'score']) {
-            audioSources[type] = [];
-        }
+	try {
+		// Pre-create nodes only for paddle and score
+		for (const type of ['paddle', 'score']) {
+			audioSources[type] = [];
+		}
 
-        // Load only paddle and score sounds
-        const sounds = { 
-            paddle: paddleHitSound, 
-            score: scoreSound 
-        };
-    } catch (error) {
-        console.error("Audio initialization failed:", error);
-    }
+		// Load only paddle and score sounds
+		const sounds = {
+			paddle: paddleHitSound,
+			score: scoreSound
+		};
+	} catch (error) {
+		console.error("Audio initialization failed:", error);
+	}
 }
 
 function playerCollision(ball, player, name) {
-    let dx = Math.abs(ball.pos.x - player.getcenter().x);
-    let dy = Math.abs(ball.pos.y - player.getcenter().y);
+	let dx = Math.abs(ball.pos.x - player.getcenter().x);
+	let dy = Math.abs(ball.pos.y - player.getcenter().y);
 
-    const willCollide = (dx < (ball.radius + player.getHalfWidth() + COLLISION_PREDICTION.PADDLE) && 
-                        dy < (ball.radius + player.getHalfHeight() + COLLISION_PREDICTION.PADDLE));
+	const willCollide = (dx < (ball.radius + player.getHalfWidth() + COLLISION_PREDICTION.PADDLE) &&
+						dy < (ball.radius + player.getHalfHeight() + COLLISION_PREDICTION.PADDLE));
 
-    if (willCollide) {
-        playBufferedSound('paddle');
-    }
+	if (willCollide) {
+		playBufferedSound('paddle');
+	}
 
-    if (dx < (ball.radius + player.getHalfWidth()) && 
-        dy < (ball.radius + player.getHalfHeight())) {
-    }
+	if (dx < (ball.radius + player.getHalfWidth()) &&
+		dy < (ball.radius + player.getHalfHeight())) {
+	}
 }
 
 Ball.prototype.update = function () {
-    // Silent bounce on top and bottom
-    if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
-        this.speed.y = -this.speed.y;
-    }
+	// Silent bounce on top and bottom
+	if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
+		this.speed.y = -this.speed.y;
+	}
 
-    // Silent bounce on the left border segments
-    if (this.pos.x - this.radius < borderWidth &&
-        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-        this.speed.x = -this.speed.x;
-    }
+	// Silent bounce on the left border segments
+	if (this.pos.x - this.radius < borderWidth &&
+		(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+		this.speed.x = -this.speed.x;
+	}
 
-    // Silent bounce on the right border segments
-    if (this.pos.x + this.radius > canvas.width - borderWidth &&
-        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-        this.speed.x = -this.speed.x;
-    }
+	// Silent bounce on the right border segments
+	if (this.pos.x + this.radius > canvas.width - borderWidth &&
+		(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+		this.speed.x = -this.speed.x;
+	}
 
-    this.pos.x += this.speed.x;
-    this.pos.y += this.speed.y;
+	this.pos.x += this.speed.x;
+	this.pos.y += this.speed.y;
 };
 
 Ball.prototype.update2 = function () {
-    const borderSegmentHeight = canvas.height / 4;
-    const borderSegmentWidth = canvas.width / 3;
-    const borderWidth = 20;
+	const borderSegmentHeight = canvas.height / 4;
+	const borderSegmentWidth = canvas.width / 3;
+	const borderWidth = 20;
 
-    // Silent bounce on border segments
-    if (this.pos.x - this.radius < borderWidth &&
-        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-        this.speed.x = -this.speed.x;
-        this.pos.x = borderWidth + this.radius;
-    }
+	// Silent bounce on border segments
+	if (this.pos.x - this.radius < borderWidth &&
+		(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+		this.speed.x = -this.speed.x;
+		this.pos.x = borderWidth + this.radius;
+	}
 
-    if (this.pos.x + this.radius > canvas.width - borderWidth &&
-        (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-        this.speed.x = -this.speed.x;
-        this.pos.x = canvas.width - borderWidth - this.radius;
-    }
+	if (this.pos.x + this.radius > canvas.width - borderWidth &&
+		(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+		this.speed.x = -this.speed.x;
+		this.pos.x = canvas.width - borderWidth - this.radius;
+	}
 
-    if (this.pos.y - this.radius < borderWidth &&
-        (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-        this.speed.y = -this.speed.y;
-        this.pos.y = borderWidth + this.radius;
-    }
+	if (this.pos.y - this.radius < borderWidth &&
+		(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+		this.speed.y = -this.speed.y;
+		this.pos.y = borderWidth + this.radius;
+	}
 
-    if (this.pos.y + this.radius > canvas.height - borderWidth &&
-        (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-        this.speed.y = -this.speed.y;
-        this.pos.y = canvas.height - borderWidth - this.radius;
-    }
+	if (this.pos.y + this.radius > canvas.height - borderWidth &&
+		(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+		this.speed.y = -this.speed.y;
+		this.pos.y = canvas.height - borderWidth - this.radius;
+	}
 
-    this.pos.x += this.speed.x;
-    this.pos.y += this.speed.y;
+	this.pos.x += this.speed.x;
+	this.pos.y += this.speed.y;
 };
 
 // Score function for two players
 function Score(ball, player1, player2) {
-    // Check if the ball is in the scoring area
-    if (ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
-        if (gameSettings.soundEnabled) {
-            scoreSound.currentTime = 0;
-            scoreSound.playbackRate = 1.2; // Faster playback
-            scoreSound.volume = gameSettings.soundVolume;
-            scoreSound.play().catch(error => console.log("Audio play failed:", error));
-        }
-        if (ball.pos.x <= -ball.radius) {
-            player2.score += 1;
-            document.getElementById("Player_2").innerHTML = player2.score;
-            resetBall(ball);
-        }
+	// Check if the ball is in the scoring area
+	if (ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
+		if (gameSettings.soundEnabled) {
+			scoreSound.currentTime = 0;
+			scoreSound.playbackRate = 1.2; // Faster playback
+			scoreSound.volume = gameSettings.soundVolume;
+			scoreSound.play().catch(error => console.log("Audio play failed:", error));
+		}
+		if (ball.pos.x <= -ball.radius) {
+			player2.score += 1;
+			document.getElementById("Player_2").innerHTML = player2.score;
+			resetBall(ball);
+		}
 
-        if (ball.pos.x >= canvas.width + ball.radius) {
-            player1.score += 1;
-            document.getElementById("Player_1").innerHTML = player1.score;
-            resetBall(ball);
-        }
-    }
+		if (ball.pos.x >= canvas.width + ball.radius) {
+			player1.score += 1;
+			document.getElementById("Player_1").innerHTML = player1.score;
+			resetBall(ball);
+		}
+	}
 
-    // Check if a player has won
-    if (player1.score === 10 || player2.score === 10) {
-        if (gameSettings.soundEnabled) {
-            scoreSound.currentTime = 0;
-            scoreSound.volume = gameSettings.soundVolume;
-            scoreSound.play().catch(error => console.log("Audio play failed:", error));
-        }
-        gameOver(player1.score === 10 ? "Player 1" : "Player 2");
-        return;
-    }
+	// Check if a player has won
+	if (player1.score === 10 || player2.score === 10) {
+		if (gameSettings.soundEnabled) {
+			scoreSound.currentTime = 0;
+			scoreSound.volume = gameSettings.soundVolume;
+			scoreSound.play().catch(error => console.log("Audio play failed:", error));
+		}
+		gameOver(player1.score === 10 ? "Player 1" : "Player 2");
+		return;
+	}
 }
 
 // score function for multiplayer
 function Score2(ball, player1, player2, player3, player4) {
-    // Check if the ball is in the scoring area
-    if (ball.pos.y <= -ball.radius || ball.pos.y >= canvas.height + ball.radius || 
-        ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
-        
-        let scoreOccurred = false;
+	// Check if the ball is in the scoring area
+	if (ball.pos.y <= -ball.radius || ball.pos.y >= canvas.height + ball.radius ||
+		ball.pos.x <= -ball.radius || ball.pos.x >= canvas.width + ball.radius) {
 
-        if (lastHit === "Player_1" && !(ball.pos.x <= -ball.radius)) {
-            player1.score += 1;
-            document.getElementById("Player_1").innerHTML = player1.score;
-            scoreOccurred = true;
-        }
-        if (lastHit === "Player_3" && !(ball.pos.y <= -ball.radius)) {
-            player3.score += 1;
-            document.getElementById("Player_3").innerHTML = player3.score;
-            scoreOccurred = true;
-        }
-        if (lastHit === "Player_2" && !(ball.pos.x >= canvas.width + ball.radius)) {
-            player2.score += 1;
-            document.getElementById("Player_2").innerHTML = player2.score;
-            scoreOccurred = true;
-        }
-        if (lastHit === "Player_4" && !(ball.pos.y >= canvas.height + ball.radius)) {
-            player4.score += 1;
-            document.getElementById("Player_4").innerHTML = player4.score;
-            scoreOccurred = true;
-        }
+		let scoreOccurred = false;
 
-        // Only play sound if a score actually occurred
-        if (scoreOccurred && gameSettings.soundEnabled) {
-            scoreSound.currentTime = 0;
-            scoreSound.playbackRate = 1.2;
-            scoreSound.volume = gameSettings.soundVolume;
-            scoreSound.play().catch(error => console.log("Audio play failed:", error));
-        }
+		if (lastHit === "Player_1" && !(ball.pos.x <= -ball.radius)) {
+			player1.score += 1;
+			document.getElementById("Player_1").innerHTML = player1.score;
+			scoreOccurred = true;
+		}
+		if (lastHit === "Player_3" && !(ball.pos.y <= -ball.radius)) {
+			player3.score += 1;
+			document.getElementById("Player_3").innerHTML = player3.score;
+			scoreOccurred = true;
+		}
+		if (lastHit === "Player_2" && !(ball.pos.x >= canvas.width + ball.radius)) {
+			player2.score += 1;
+			document.getElementById("Player_2").innerHTML = player2.score;
+			scoreOccurred = true;
+		}
+		if (lastHit === "Player_4" && !(ball.pos.y >= canvas.height + ball.radius)) {
+			player4.score += 1;
+			document.getElementById("Player_4").innerHTML = player4.score;
+			scoreOccurred = true;
+		}
 
-        resetBall(ball);
-    }
+		// Only play sound if a score actually occurred
+		if (scoreOccurred && gameSettings.soundEnabled) {
+			scoreSound.currentTime = 0;
+			scoreSound.playbackRate = 1.2;
+			scoreSound.volume = gameSettings.soundVolume;
+			scoreSound.play().catch(error => console.log("Audio play failed:", error));
+		}
 
-    // Check if a player has won
-    const winningScore = 5;
-    if (player1.score === winningScore || player2.score === winningScore || 
-        player3.score === winningScore || player4.score === winningScore) {
-        
-        // Play victory sound
-        if (gameSettings.soundEnabled) {
-            scoreSound.currentTime = 0;
-            scoreSound.volume = gameSettings.soundVolume;
-            scoreSound.play().catch(error => console.log("Audio play failed:", error));
-        }
-        
-        if (player1.score === winningScore) gameover_2("Player 1");
-        else if (player2.score === winningScore) gameover_2("Player 2");
-        else if (player3.score === winningScore) gameover_2("Player 3");
-        else if (player4.score === winningScore) gameover_2("Player 4");
-        return;
-    }
+		resetBall(ball);
+	}
+
+	// Check if a player has won
+	const winningScore = 5;
+	if (player1.score === winningScore || player2.score === winningScore ||
+		player3.score === winningScore || player4.score === winningScore) {
+
+		// Play victory sound
+		if (gameSettings.soundEnabled) {
+			scoreSound.currentTime = 0;
+			scoreSound.volume = gameSettings.soundVolume;
+			scoreSound.play().catch(error => console.log("Audio play failed:", error));
+		}
+
+		if (player1.score === winningScore) gameover_2("Player 1");
+		else if (player2.score === winningScore) gameover_2("Player 2");
+		else if (player3.score === winningScore) gameover_2("Player 3");
+		else if (player4.score === winningScore) gameover_2("Player 4");
+		return;
+	}
 }
 
 function resetBall(ball) {
-    const StartSpeed = baseSpeedX;  // Reduce this to slow down the ball on start
-    const randomDirection = Math.random() < 0.5 ? -1 : 1;
+	const StartSpeed = baseSpeedX;  // Reduce this to slow down the ball on start
+	const randomDirection = Math.random() < 0.5 ? -1 : 1;
 
-    lastHit = null;
-    ball.pos.x = canvas.width / 2;
-    ball.pos.y = canvas.height / 2;
+	lastHit = null;
+	ball.pos.x = canvas.width / 2;
+	ball.pos.y = canvas.height / 2;
 
-    // Set initial speed for both axes
-    ball.speed.x = StartSpeed * randomDirection;
-    ball.speed.y = StartSpeed * (Math.random() < 0.5 ? -1 : 1);
+	// Set initial speed for both axes
+	ball.speed.x = StartSpeed * randomDirection;
+	ball.speed.y = StartSpeed * (Math.random() < 0.5 ? -1 : 1);
 
-    console.log("Ball reset with speed:", ball.speed.x, ball.speed.y);
+	console.log("Ball reset with speed:", ball.speed.x, ball.speed.y);
 }
 
 //
 function resetPosition_2(player1, player2, player3, player4) {
-    player1.pos = vector(20, canvas.height / 2 - playerHeight / 2);
-    player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
-    player3.pos = vector(canvas.width / 2 - playerHeight / 2, 20);
-    player4.pos = vector(canvas.width / 2 - playerHeight / 2, canvas.height - playerWidth - 20);
+	player1.pos = vector(20, canvas.height / 2 - playerHeight / 2);
+	player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
+	player3.pos = vector(canvas.width / 2 - playerHeight / 2, 20);
+	player4.pos = vector(canvas.width / 2 - playerHeight / 2, canvas.height - playerWidth - 20);
 }
 
 function resetPosition(player1, player2) {
-    player1.pos = vector(20, canvas.height / 2 - playerHeight / 2);
-    player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
+	player1.pos = vector(20, canvas.height / 2 - playerHeight / 2);
+	player2.pos = vector(canvas.width - 20 - playerWidth, canvas.height / 2 - playerHeight / 2);
 }
 
 
 
 document.getElementById('playAgain').addEventListener('click', () => {
-    document.getElementById('gameOver').style.display = 'none';
-    gameContainer.style.opacity = '1';
-    isGameOver = false;
-    isPaused = false;
-    gameStarted = true;
-    Restart.click();
-    resultSaved = false;
+	document.getElementById('gameOver').style.display = 'none';
+	gameContainer.style.opacity = '1';
+	isGameOver = false;
+	isPaused = false;
+	gameStarted = true;
+	Restart.click();
+	resultSaved = false;
 });
 
 document.getElementById('returnToMenu').addEventListener('click', () => {
-    document.getElementById('gameOver').style.display = 'none';
-    gameContainer.style.opacity = '1';
-    isGameOver = false;
-    isPaused = false;
-    gameStarted = false;
-    Menu.click();
-    resultSaved = false;
+	document.getElementById('gameOver').style.display = 'none';
+	gameContainer.style.opacity = '1';
+	isGameOver = false;
+	isPaused = false;
+	gameStarted = false;
+	Menu.click();
+	resultSaved = false;
 });
 
 // Update the gameOver and gameover_2 functions
 function gameOver(winner) {
-    resetBall(ball);
-    let score = winner === "Player 1" ? player1.score : player2.score;
-    showGameOver(winner, score);
+	resetBall(ball);
+	let score = winner === "Player 1" ? player1.score : player2.score;
+	showGameOver(winner, score);
 }
 
 function gameover_2(winner) {
-    resetBall(ball);
-    let score;
-    switch(winner) {
-        case "Player 1": score = player_1.score; break;
-        case "Player 2": score = player_2.score; break;
-        case "Player 3": score = player3.score; break;
-        case "Player 4": score = player4.score; break;
-    }
-    showGameOver(winner, score);
+	resetBall(ball);
+	let score;
+	switch(winner) {
+		case "Player 1": score = player_1.score; break;
+		case "Player 2": score = player_2.score; break;
+		case "Player 3": score = player3.score; break;
+		case "Player 4": score = player4.score; break;
+	}
+	showGameOver(winner, score);
 }
 
 function Ball(pos, radius, speed) {
-    this.pos = pos;
-    this.radius = radius;
-    this.speed = speed;
+	this.pos = pos;
+	this.radius = radius;
+	this.speed = speed;
 
-    let borderSegmentHeight = canvas.height / 7;
-    const borderWidth = 20;
+	let borderSegmentHeight = canvas.height / 7;
+	const borderWidth = 20;
 
-    const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
+	const BASE_SPEED_RATIO = 0.01; // Speed is 10% of the canvas width/height
 
-    this.update = function () {
-        // Silent bounce on top and bottom
-        if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
-            this.speed.y = -this.speed.y;
-        }
+	this.update = function () {
+		// Silent bounce on top and bottom
+		if (this.pos.y + this.radius > canvas.height || this.pos.y - this.radius < 0) {
+			this.speed.y = -this.speed.y;
+		}
 
-        // Silent bounce on the left border segments
-        if (this.pos.x - this.radius < borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-        }
+		// Silent bounce on the left border segments
+		if (this.pos.x - this.radius < borderWidth &&
+			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+			this.speed.x = -this.speed.x;
+		}
 
-        // Silent bounce on the right border segments
-        if (this.pos.x + this.radius > canvas.width - borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-        }
+		// Silent bounce on the right border segments
+		if (this.pos.x + this.radius > canvas.width - borderWidth &&
+			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+			this.speed.x = -this.speed.x;
+		}
 
-        this.pos.x += this.speed.x;
-        this.pos.y += this.speed.y;
-    };
+		this.pos.x += this.speed.x;
+		this.pos.y += this.speed.y;
+	};
 
-    this.update2 = function () {
-        const borderSegmentHeight = canvas.height / 4;
-        const borderSegmentWidth = canvas.width / 3;
-        const borderWidth = 20;
+	this.update2 = function () {
+		const borderSegmentHeight = canvas.height / 4;
+		const borderSegmentWidth = canvas.width / 3;
+		const borderWidth = 20;
 
-        // Silent bounce on border segments
-        if (this.pos.x - this.radius < borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-            this.pos.x = borderWidth + this.radius;
-        }
+		// Silent bounce on border segments
+		if (this.pos.x - this.radius < borderWidth &&
+			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+			this.speed.x = -this.speed.x;
+			this.pos.x = borderWidth + this.radius;
+		}
 
-        if (this.pos.x + this.radius > canvas.width - borderWidth &&
-            (this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
-            this.speed.x = -this.speed.x;
-            this.pos.x = canvas.width - borderWidth - this.radius;
-        }
+		if (this.pos.x + this.radius > canvas.width - borderWidth &&
+			(this.pos.y < borderSegmentHeight || this.pos.y > canvas.height - borderSegmentHeight)) {
+			this.speed.x = -this.speed.x;
+			this.pos.x = canvas.width - borderWidth - this.radius;
+		}
 
-        if (this.pos.y - this.radius < borderWidth &&
-            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-            this.speed.y = -this.speed.y;
-            this.pos.y = borderWidth + this.radius;
-        }
+		if (this.pos.y - this.radius < borderWidth &&
+			(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+			this.speed.y = -this.speed.y;
+			this.pos.y = borderWidth + this.radius;
+		}
 
-        if (this.pos.y + this.radius > canvas.height - borderWidth &&
-            (this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
-            this.speed.y = -this.speed.y;
-            this.pos.y = canvas.height - borderWidth - this.radius;
-        }
+		if (this.pos.y + this.radius > canvas.height - borderWidth &&
+			(this.pos.x < borderSegmentWidth || this.pos.x > canvas.width - borderSegmentWidth)) {
+			this.speed.y = -this.speed.y;
+			this.pos.y = canvas.height - borderWidth - this.radius;
+		}
 
-        this.pos.x += this.speed.x;
-        this.pos.y += this.speed.y;
-    };
+		this.pos.x += this.speed.x;
+		this.pos.y += this.speed.y;
+	};
 
-    this.draw = function () {
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-    };
+	this.draw = function () {
+		ctx.fillStyle = 'white';
+		ctx.strokeStyle = 'white';
+		ctx.beginPath();
+		ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.stroke();
+	};
 }
 
 function Player(pos, width, height, speed)
@@ -609,36 +609,36 @@ function Player(pos, width, height, speed)
 
 
 function Player2IA(ball, player) {
-    // Calculate target position with some prediction
-    const prediction = ball.pos.y + (ball.speed.y * 3);
-    const targetY = Math.min(
-        Math.max(prediction - player.height / 2, canvas.height / 10),
-        canvas.height - canvas.height / 10 - player.height
-    );
+	// Calculate target position with some prediction
+	const prediction = ball.pos.y + (ball.speed.y * 3);
+	const targetY = Math.min(
+		Math.max(prediction - player.height / 2, canvas.height / 10),
+		canvas.height - canvas.height / 10 - player.height
+	);
 
-    // Calculate distance to target
-    const distance = targetY - player.pos.y;
-    
-    // Smoothly move towards target
-    if (Math.abs(distance) > player.speed) {
-        // Only move if ball is moving towards the bot
-        if (ball.speed.x > 0) {
-            // Add "reaction time" - only move when ball is in bot's half
-            if (ball.pos.x > canvas.width / 2) {
-                player.pos.y += Math.sign(distance) * (player.speed * 0.9);
-            }
-        } else {
-            // Return to center when ball is moving away
-            const centerY = canvas.height / 2 - player.height / 2;
-            player.pos.y += Math.sign(centerY - player.pos.y) * (player.speed * 0.5);
-        }
-    }
+	// Calculate distance to target
+	const distance = targetY - player.pos.y;
 
-    // Ensure player stays within bounds
-    player.pos.y = Math.max(
-        canvas.height / 10,
-        Math.min(canvas.height - canvas.height / 10 - player.height, player.pos.y)
-    );
+	// Smoothly move towards target
+	if (Math.abs(distance) > player.speed) {
+		// Only move if ball is moving towards the bot
+		if (ball.speed.x > 0) {
+			// Add "reaction time" - only move when ball is in bot's half
+			if (ball.pos.x > canvas.width / 2) {
+				player.pos.y += Math.sign(distance) * (player.speed * 0.9);
+			}
+		} else {
+			// Return to center when ball is moving away
+			const centerY = canvas.height / 2 - player.height / 2;
+			player.pos.y += Math.sign(centerY - player.pos.y) * (player.speed * 0.5);
+		}
+	}
+
+	// Ensure player stays within bounds
+	player.pos.y = Math.max(
+		canvas.height / 10,
+		Math.min(canvas.height - canvas.height / 10 - player.height, player.pos.y)
+	);
 }
 
 // Get audio elements
@@ -647,78 +647,78 @@ const scoreSound = document.getElementById('scoreSound');
 
 // Update playerCollision function to play sound earlier
 function playerCollision(ball, player, name) {
-    let dx = Math.abs(ball.pos.x - player.getcenter().x);
-    let dy = Math.abs(ball.pos.y - player.getcenter().y);
+	let dx = Math.abs(ball.pos.x - player.getcenter().x);
+	let dy = Math.abs(ball.pos.y - player.getcenter().y);
 
-    // Increased detection range and earlier trigger
-    if (dx < (ball.radius + player.getHalfWidth()) && 
-        dy < (ball.radius + player.getHalfHeight())) {
-        if (gameSettings.soundEnabled) {
-            paddleHitSound.currentTime = 0;
-            paddleHitSound.playbackRate = 1.2; // Faster playback
-            paddleHitSound.volume = gameSettings.soundVolume;
-            paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
-        }
-    }
+	// Increased detection range and earlier trigger
+	if (dx < (ball.radius + player.getHalfWidth()) &&
+		dy < (ball.radius + player.getHalfHeight())) {
+		if (gameSettings.soundEnabled) {
+			paddleHitSound.currentTime = 0;
+			paddleHitSound.playbackRate = 1.2; // Faster playback
+			paddleHitSound.volume = gameSettings.soundVolume;
+			paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
+		}
+	}
 
-    if (dx < (ball.radius + player.getHalfWidth()) && 
-        dy < (ball.radius + player.getHalfHeight())) {
-        if (gameSettings.soundEnabled && paddleHitSound.readyState >= 2) {
-            paddleHitSound.currentTime = 0;
-            paddleHitSound.volume = gameSettings.soundVolume;
-            const playPromise = paddleHitSound.play();
-            if (playPromise) {
-                playPromise.catch(() => {
-                    // Retry playing the sound
-                    setTimeout(() => {
-                        paddleHitSound.play().catch(error => console.log("Retry failed:", error));
-                    }, 10);
-                });
-            }
-        }
-        
-        // Determine if the player is horizontal or vertical
-        const isHorizontal = player.getHalfWidth() > player.getHalfHeight();
+	if (dx < (ball.radius + player.getHalfWidth()) &&
+		dy < (ball.radius + player.getHalfHeight())) {
+		if (gameSettings.soundEnabled && paddleHitSound.readyState >= 2) {
+			paddleHitSound.currentTime = 0;
+			paddleHitSound.volume = gameSettings.soundVolume;
+			const playPromise = paddleHitSound.play();
+			if (playPromise) {
+				playPromise.catch(() => {
+					// Retry playing the sound
+					setTimeout(() => {
+						paddleHitSound.play().catch(error => console.log("Retry failed:", error));
+					}, 10);
+				});
+			}
+		}
 
-        if (isHorizontal) {
-            // Horizontal players (Player 1, Player 2)
-            ball.speed.y *= -1;
+		// Determine if the player is horizontal or vertical
+		const isHorizontal = player.getHalfWidth() > player.getHalfHeight();
 
-            // Resolve overlap to prevent sticking
-            if (ball.pos.y < player.getcenter().y) {
-                ball.pos.y = player.getcenter().y - (player.getHalfHeight() + ball.radius);
-            } else {
-                ball.pos.y = player.getcenter().y + (player.getHalfHeight() + ball.radius);
-            }
+		if (isHorizontal) {
+			// Horizontal players (Player 1, Player 2)
+			ball.speed.y *= -1;
 
-            // Adjust horizontal speed for deflection
-            const hitPosition = (ball.pos.x - player.getcenter().x) / player.getHalfWidth();
-            ball.speed.x += hitPosition * 1.5; // Adjust for deflection
-        } else {
-            // Vertical players (Player 3, Player 4)
-            ball.speed.x *= -1;
+			// Resolve overlap to prevent sticking
+			if (ball.pos.y < player.getcenter().y) {
+				ball.pos.y = player.getcenter().y - (player.getHalfHeight() + ball.radius);
+			} else {
+				ball.pos.y = player.getcenter().y + (player.getHalfHeight() + ball.radius);
+			}
 
-            // Resolve overlap to prevent sticking
-            if (ball.pos.x < player.getcenter().x) {
-                ball.pos.x = player.getcenter().x - (player.getHalfWidth() + ball.radius);
-            } else {
-                ball.pos.x = player.getcenter().x + (player.getHalfWidth() + ball.radius);
-            }
+			// Adjust horizontal speed for deflection
+			const hitPosition = (ball.pos.x - player.getcenter().x) / player.getHalfWidth();
+			ball.speed.x += hitPosition * 1.5; // Adjust for deflection
+		} else {
+			// Vertical players (Player 3, Player 4)
+			ball.speed.x *= -1;
 
-            // Adjust vertical speed for deflection
-            const hitPosition = (ball.pos.y - player.getcenter().y) / player.getHalfHeight();
-            ball.speed.y += hitPosition * 1.5; // Adjust for deflection
-        }
-        // Update lastHit to track who hit the ball
-        if (name) lastHit = name;
+			// Resolve overlap to prevent sticking
+			if (ball.pos.x < player.getcenter().x) {
+				ball.pos.x = player.getcenter().x - (player.getHalfWidth() + ball.radius);
+			} else {
+				ball.pos.x = player.getcenter().x + (player.getHalfWidth() + ball.radius);
+			}
+
+			// Adjust vertical speed for deflection
+			const hitPosition = (ball.pos.y - player.getcenter().y) / player.getHalfHeight();
+			ball.speed.y += hitPosition * 1.5; // Adjust for deflection
+		}
+		// Update lastHit to track who hit the ball
+		if (name) lastHit = name;
 		// Increase ball speed
-        if (Math.abs(ball.speed.x) < 15) {
-            ball.speed.x += (ball.speed.x > 0 ? 0.5 : -0.5);
-        }
-        if (Math.abs(ball.speed.y) < 15) {
-            ball.speed.y += (ball.speed.y > 0 ? 0.5 : -0.5);
-        }
-    }
+		if (Math.abs(ball.speed.x) < 15) {
+			ball.speed.x += (ball.speed.x > 0 ? 0.5 : -0.5);
+		}
+		if (Math.abs(ball.speed.y) < 15) {
+			ball.speed.y += (ball.speed.y > 0 ? 0.5 : -0.5);
+		}
+	}
 }
 
 function drawfield()
@@ -758,64 +758,64 @@ function drawfield()
 }
 
 function drawfield_multiplayer() {
-    ctx.strokeStyle = 'red';
+	ctx.strokeStyle = 'red';
 
-    // Player 1 & 2 (Side players - smaller goals)
-    // Left side
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, canvas.height / 4); // Decreased goal size
-    ctx.stroke();
+	// Player 1 & 2 (Side players - smaller goals)
+	// Left side
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(0, 0);
+	ctx.lineTo(0, canvas.height / 4); // Decreased goal size
+	ctx.stroke();
 
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(0, canvas.height - (canvas.height / 4)); // Decreased goal size
-    ctx.stroke();
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(0, canvas.height);
+	ctx.lineTo(0, canvas.height - (canvas.height / 4)); // Decreased goal size
+	ctx.stroke();
 
-    // Right side
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(canvas.width, 0);
-    ctx.lineTo(canvas.width, (canvas.height / 4)); // Decreased goal size
-    ctx.stroke();
+	// Right side
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(canvas.width, 0);
+	ctx.lineTo(canvas.width, (canvas.height / 4)); // Decreased goal size
+	ctx.stroke();
 
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(canvas.width, canvas.height);
-    ctx.lineTo(canvas.width, (canvas.height - canvas.height / 4)); // Decreased goal size
-    ctx.stroke();
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(canvas.width, canvas.height);
+	ctx.lineTo(canvas.width, (canvas.height - canvas.height / 4)); // Decreased goal size
+	ctx.stroke();
 
-    // Player 3 & 4 (Top/Bottom players - larger goals)
-    // Top player
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(0, 0);
-    ctx.lineTo(canvas.width / 3, 0); // Increased goal size
-    ctx.stroke();
+	// Player 3 & 4 (Top/Bottom players - larger goals)
+	// Top player
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(0, 0);
+	ctx.lineTo(canvas.width / 3, 0); // Increased goal size
+	ctx.stroke();
 
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(canvas.width, 0);
-    ctx.lineTo(canvas.width - canvas.width / 3, 0); // Increased goal size
-    ctx.stroke();
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(canvas.width, 0);
+	ctx.lineTo(canvas.width - canvas.width / 3, 0); // Increased goal size
+	ctx.stroke();
 
-    // Bottom player
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(canvas.width / 3, canvas.height); // Increased goal size
-    ctx.stroke();
+	// Bottom player
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(0, canvas.height);
+	ctx.lineTo(canvas.width / 3, canvas.height); // Increased goal size
+	ctx.stroke();
 
-    ctx.beginPath();
-    ctx.lineWidth = 20;
-    ctx.moveTo(canvas.width, canvas.height);
-    ctx.lineTo(canvas.width - canvas.width / 3, canvas.height); // Increased goal size
-    ctx.stroke();
+	ctx.beginPath();
+	ctx.lineWidth = 20;
+	ctx.moveTo(canvas.width, canvas.height);
+	ctx.lineTo(canvas.width - canvas.width / 3, canvas.height); // Increased goal size
+	ctx.stroke();
 
 	// Middle line
-    ctx.beginPath();
+	ctx.beginPath();
 	ctx.lineWidth = 2;
 	ctx.setLineDash([10, 10]); // Shorter dashes for retro look
 	ctx.moveTo(canvas.width / 2, 0);
@@ -890,62 +890,62 @@ function drawgame()
 
 // Settings management
 let gameSettings = {
-    soundEnabled: true,
-    soundVolume: 0.5
+	soundEnabled: true,
+	soundVolume: 0.5
 };
 
 // Load settings from localStorage
 function loadSettings() {
-    const savedSettings = localStorage.getItem('pongSettings');
-    if (savedSettings) {
-        gameSettings = JSON.parse(savedSettings);
-        document.getElementById('soundVolume').value = gameSettings.soundVolume * 100;
-        document.getElementById('soundToggle').checked = gameSettings.soundEnabled;
-    }
+	const savedSettings = localStorage.getItem('pongSettings');
+	if (savedSettings) {
+		gameSettings = JSON.parse(savedSettings);
+		document.getElementById('soundVolume').value = gameSettings.soundVolume * 100;
+		document.getElementById('soundToggle').checked = gameSettings.soundEnabled;
+	}
 }
 
 // Save settings to localStorage
 function saveSettings() {
-    gameSettings.soundVolume = parseInt(document.getElementById('soundVolume').value) / 100;
-    gameSettings.soundEnabled = document.getElementById('soundToggle').checked;
-    
-    console.log('Settings saved:', gameSettings);
-    
-    // Test sound
-    if (gameSettings.soundEnabled) {
-        paddleHitSound.volume = gameSettings.soundVolume;
-        paddleHitSound.currentTime = 0;
-        paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
-    }
-    
-    localStorage.setItem('pongSettings', JSON.stringify(gameSettings));
-    hideSettingsMenu(); // This will also resume the game
+	gameSettings.soundVolume = parseInt(document.getElementById('soundVolume').value) / 100;
+	gameSettings.soundEnabled = document.getElementById('soundToggle').checked;
+
+	console.log('Settings saved:', gameSettings);
+
+	// Test sound
+	if (gameSettings.soundEnabled) {
+		paddleHitSound.volume = gameSettings.soundVolume;
+		paddleHitSound.currentTime = 0;
+		paddleHitSound.play().catch(error => console.log("Audio play failed:", error));
+	}
+
+	localStorage.setItem('pongSettings', JSON.stringify(gameSettings));
+	hideSettingsMenu(); // This will also resume the game
 }
 
 // Show/Hide Settings Menu
 function showSettingsMenu() {
-    document.getElementById('settingsMenu').style.display = 'block';
-    isPaused = true; // Pause the game when settings are open
+	document.getElementById('settingsMenu').style.display = 'block';
+	isPaused = true; // Pause the game when settings are open
 }
 
 // Update hideSettingsMenu function
 function hideSettingsMenu() {
-    const settingsMenu = document.getElementById('settingsMenu');
-    settingsMenu.style.display = 'none';
-    isPaused = false; // Resume the game when settings are closed
+	const settingsMenu = document.getElementById('settingsMenu');
+	settingsMenu.style.display = 'none';
+	isPaused = false; // Resume the game when settings are closed
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    loadSettings();
-    
-    document.getElementById('Settings').addEventListener('click', showSettingsMenu);
-    document.getElementById('saveSettings').addEventListener('click', saveSettings);
-    document.getElementById('cancelSettings').addEventListener('click', () => {
-        // Restore previous settings and hide menu
-        loadSettings();
-        hideSettingsMenu();
-    });
+	loadSettings();
+
+	document.getElementById('Settings').addEventListener('click', showSettingsMenu);
+	document.getElementById('saveSettings').addEventListener('click', saveSettings);
+	document.getElementById('cancelSettings').addEventListener('click', () => {
+		// Restore previous settings and hide menu
+		loadSettings();
+		hideSettingsMenu();
+	});
 });
 
 // Add a new variable for game pause state
@@ -953,212 +953,226 @@ let isPaused = false;
 
 // Add escape key handler to close settings
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.getElementById('settingsMenu').style.display === 'block') {
-        hideSettingsMenu();
-    }
+	if (e.key === 'Escape' && document.getElementById('settingsMenu').style.display === 'block') {
+		hideSettingsMenu();
+	}
 });
 
 
 class GameAPI {
-    static async getGameResults() {
-        const response = await fetch('/api/games/');
-        return await response.json();
-    }
-    static async saveGameResult(gameData) {
-        const response = await fetch('/api/games/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': this.getCsrfToken(),
-            },
-            body: JSON.stringify(gameData)
-        });
-        return await response.json();
-    }
+	static async getGameResults() {
+		const response = await fetch('/api/games/');
+		return await response.json();
+	}
+	static async saveGameResult(gameData) {
+		const response = await fetch('/api/games/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': this.getCsrfToken(),
+			},
+			body: JSON.stringify(gameData)
+		});
+		return await response.json();
+	}
 
-    static getCsrfToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
-    }
+	static getCsrfToken() {
+		return document.querySelector('[name=csrfmiddlewaretoken]').value;
+	}
 }
 
 function getCsrfToken() {
-    // Try cookie first
-    const cookies = document.cookie.split(';');
-    const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
-    if (csrfCookie) {
-        return csrfCookie.split('=')[1];
-    }
+	// Try cookie first
+	const cookies = document.cookie.split(';');
+	const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
+	if (csrfCookie) {
+		return csrfCookie.split('=')[1];
+	}
 
-    // Fallback to meta tag
-    const metaToken = document.querySelector('meta[name="csrf-token"]');
-    if (metaToken) {
-        return metaToken.getAttribute('content');
-    }
+	// Fallback to meta tag
+	const metaToken = document.querySelector('meta[name="csrf-token"]');
+	if (metaToken) {
+		return metaToken.getAttribute('content');
+	}
 
-    console.error('CSRF token not found');
-    return null;
+	console.error('CSRF token not found');
+	return null;
 }
 
 
 async function saveGameResult(winner) {
-    const csrfToken = getCsrfToken();
+	const csrfToken = getCsrfToken();
 
-    const isTournamentFinal = tournament.isActive && tournament.roundWinners.length === 3;
-    let gameType;
-    if (tournament.isActive) {
-        gameType = 'TRN';  // Tournament game
-    } else {
-        gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
-    }
+	const isTournamentFinal = tournament.isActive && tournament.roundWinners.length === 3;
+	let gameType;
+	if (tournament.isActive) {
+		gameType = 'TRN';  // Tournament game
+	} else {
+		gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
+	}
 
-    // Get player usernames from the DOM
-    const player1_username = document.getElementById('Name1').textContent;
-    const player2_username = document.getElementById('Name2').textContent;
-    const player3_username = document.getElementById('Name3').textContent;
-    const player4_username = document.getElementById('Name4').textContent;
+	// Get player usernames from the DOM
+	const player1_username = document.getElementById('Name1').textContent;
+	const player2_username = document.getElementById('Name2').textContent;
+	const player3_username = document.getElementById('Name3').textContent;
+	const player4_username = document.getElementById('Name4').textContent;
 
-    const player1_score = player1.score;
-    const player2_score = player2.score;
-    const player3_score = player3.score;
-    const player4_score = player4.score;
+	const player1_score = player1.score;
+	const player2_score = player2.score;
+	const player3_score = player3.score;
+	const player4_score = player4.score;
 
-    // Determine the winner
-    let winnerNumber;
-    if (winner === "Player 1") {
-        winnerNumber = 1;
-    } else if (winner === "Player 2") {
-        winnerNumber = 2;
-    } else if (winner === "Player 3") {
-        winnerNumber = 3;
-    } else if (winner === "Player 4") {
-        winnerNumber = 4;
-    }
+	// Determine the winner
+	let winnerNumber;
+	if (winner === "Player 1") {
+		winnerNumber = 1;
+	} else if (winner === "Player 2") {
+		winnerNumber = 2;
+	} else if (winner === "Player 3") {
+		winnerNumber = 3;
+	} else if (winner === "Player 4") {
+		winnerNumber = 4;
+	}
 
-    // Determine tournament round
-    let tournamentRound = null;
-    if (tournament.isActive || isTournamentFinal) {
-        tournamentRound = tournament.roundWinners.length <= 2 ? 1 : 2;
-    }
+	// Determine tournament round
+	let tournamentRound = null;
+	if (tournament.isActive || isTournamentFinal) {
+		tournamentRound = tournament.roundWinners.length <= 2 ? 1 : 2;
+	}
 
-    const data = {
-        game_type: gameType,
-        player1: player1_username,
-        player2: player2_username,
-        player3: player3_username,
-        player4: player4_username,
-        player1_score: player1_score,
-        player2_score: player2_score,
-        player3_score: player3_score,
-        player4_score: player4_score,
-        winner: winnerNumber,
-        is_tournament_match: Boolean(tournament.isActive || isTournamentFinal),
-        tournament_round: tournamentRound
-    };
+	const data = {
+		game_type: gameType,
+		player1: player1_username,
+		player2: player2_username,
+		player3: player3_username,
+		player4: player4_username,
+		player1_score: player1_score,
+		player2_score: player2_score,
+		player3_score: player3_score,
+		player4_score: player4_score,
+		winner: winnerNumber,
+		is_tournament_match: Boolean(tournament.isActive || isTournamentFinal),
+		tournament_round: tournamentRound
+	};
 
-    try {
-        const response = await fetch('/api/game-results/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify(data)
-        });
+	try {
+		const response = await fetch('/api/game-results/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrfToken
+			},
+			body: JSON.stringify(data)
+		});
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
 
-        const result = await response.json();
-        console.log('Game result saved successfully:', result);
-        resultSaved = true;
+		const result = await response.json();
+		console.log('Game result saved successfully:', result);
+		resultSaved = true;
 
-    } catch (error) {
-        console.error('Failed to save game result:', error);
-    }
+	} catch (error) {
+		console.error('Failed to save game result:', error);
+	}
 }
 
 // this function to save interrupted game data
 function saveInterruptedGame(reason) {
-    // Only save if game has actually started and there's been some progress
-    if (!gameStarted || resultSaved) return;
-    // Determine actual game type
-    let currentGameType;
-    if (playerVSbot) {
-        currentGameType = 'PVB';
-    } else if (multiplayer) {
-        currentGameType = 'MP';
-    } else if (playerVSplayer) {
-        currentGameType = 'PVP';
-    } else {
-        return; // Don't save if no valid game type
-    }
+	// Only save if game has actually started and there's been some progress
+	if (!gameStarted || resultSaved) return;
+	// Determine actual game type
+	let currentGameType;
+	if (playerVSbot) {
+		currentGameType = 'PVB';
+	} else if (multiplayer) {
+		currentGameType = 'MP';
+	} else if (playerVSplayer) {
+		currentGameType = 'PVP';
+	} else {
+		return; // Don't save if no valid game type
+	}
 
-    // Get current scores based on game type
-    const gameData = {
-        game_type: currentGameType,
-        player1_score: currentGameType === 'MP' ? player_1.score : player1.score,
-        player2_score: currentGameType === 'MP' ? player_2.score : player2.score,
-        player3_score: currentGameType === 'MP' ? player3.score : 0,
-        player4_score: currentGameType === 'MP' ? player4.score : 0,
-        winner: 'none'
-    };
+	// Get current scores based on game type
+	const gameData = {
+		game_type: currentGameType,
+		player1_score: currentGameType === 'MP' ? player_1.score : player1.score,
+		player2_score: currentGameType === 'MP' ? player_2.score : player2.score,
+		player3_score: currentGameType === 'MP' ? player3.score : 0,
+		player4_score: currentGameType === 'MP' ? player4.score : 0,
+		winner: 'none'
+	};
 
-    // Check if any scoring has occurred
-    const hasScores = Object.values(gameData)
-        .filter(value => typeof value === 'number')
-        .some(score => score > 0);
+	// Check if any scoring has occurred
+	const hasScores = Object.values(gameData)
+		.filter(value => typeof value === 'number')
+		.some(score => score > 0);
 
-    if (hasScores || reason === 'browser_close') {
-        console.log(`Game interrupted (${reason}):`, gameData);
-        saveGameResult(gameData);
-            }
+	if (hasScores || reason === 'browser_close') {
+		console.log(`Game interrupted (${reason}):`, gameData);
+		saveGameResult(gameData);
+			}
 }
 
 function loop()
 {
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    // ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+	// ctx.fillStyle = 'black';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    requestAnimationFrame(loop);
-    if (!gameStarted || isGameOver || isPaused) {  // Add isPaused check here
-        return;
-    }
-    update();
-    drawgame();
-    }
+	requestAnimationFrame(loop);
+	if (!gameStarted || isGameOver || isPaused) {  // Add isPaused check here
+		return;
+	}
+	update();
+	drawgame();
+	}
 
 loop();
 
 
-// do samthing about data saving when the gameOver saving is not working ( there is a loop problem couseding the data to be saved multiple times)
-// adding local matchmaking feature to the game
+// Tournament Management --------------------------------------------
 
-// Tournament Management
 const tournament = {
-    players: [],
-    matches: [],
-    currentMatchIndex: 0,
-    isActive: false,
-    roundWinners: []  // Track winners of each round
+	players: [],
+	matches: [],
+	currentMatchIndex: 0,
+	isActive: false,
+	roundWinners: []  // Track winners of each round
 };
 
 // Event Listeners
 document.getElementById('Tournament').addEventListener('click', () => {
-    document.getElementById('tournamentModal').style.display = 'block';
-    landingPage.style.display = 'none';
+	document.getElementById('tournamentModal').style.display = 'block';
+	landingPage.style.display = 'none';
 });
 
 document.getElementById('addPlayerBtn').addEventListener('click', () => {
     const input = document.getElementById('playerNameInput');
     const name = input.value.trim();
     
-    if (name && tournament.players.length < 4) { // Max 4 players
+    // First check if the name is empty
+    if (!name) {
+        alert('Please enter a player name');
+        return;
+    }
+
+    // Check for duplicate names (case insensitive)
+    const isDuplicate = tournament.players.some(player => 
+        player.toLowerCase() === name.toLowerCase()
+    );
+
+    if (isDuplicate) {
+        alert('This player name is already registered. Please use a different name.');
+        return;
+    }
+    
+    if (tournament.players.length < 4) { // Max 4 players
         tournament.players.push(name);
         updatePlayersList();
-        input.value = '';
+        input.value = ''; // Clear the input field
         
         // Enable start button only when we have exactly 4 players
         document.getElementById('startTournamentBtn').disabled = tournament.players.length !== 4;
@@ -1170,286 +1184,309 @@ document.getElementById('addPlayerBtn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('startTournamentBtn').addEventListener('click', () => {
-    if (tournament.players.length >= 4) {
-        initializeTournament();
-        document.querySelector('.tournament-setup').style.display = 'none';
-        document.querySelector('.tournament-bracket').style.display = 'block';
+// Optional: Add input validation while typing
+document.getElementById('playerNameInput').addEventListener('input', (e) => {
+    const input = e.target;
+    const name = input.value.trim();
+    
+    // Check for duplicate names in real-time
+    const isDuplicate = tournament.players.some(player => 
+        player.toLowerCase() === name.toLowerCase()
+    );
+    
+    if (isDuplicate) {
+        input.classList.add('duplicate');
+        // Windows 95 style alert when needed
+        // alert('This name is already taken');
+    } else {
+        input.classList.remove('duplicate');
     }
+});
+
+document.getElementById('startTournamentBtn').addEventListener('click', () => {
+	if (tournament.players.length >= 4) {
+		initializeTournament();
+		document.querySelector('.tournament-setup').style.display = 'none';
+		document.querySelector('.tournament-bracket').style.display = 'block';
+	}
 });
 
 document.getElementById('cancelTournamentBtn').addEventListener('click', () => {
-    document.getElementById('tournamentModal').style.display = 'none';
-    landingPage.style.display = 'flex';
-    resetTournament();
+	document.getElementById('tournamentModal').style.display = 'none';
+	landingPage.style.display = 'flex';
+	resetTournament();
 });
 
 document.getElementById('startMatchBtn').addEventListener('click', () => {
-    const currentMatch = tournament.matches[tournament.currentMatchIndex];
-    if (currentMatch) {
-        startTournamentMatch(currentMatch.player1, currentMatch.player2);
-    }
+	const currentMatch = tournament.matches[tournament.currentMatchIndex];
+	if (currentMatch) {
+		startTournamentMatch(currentMatch.player1, currentMatch.player2);
+	}
 });
 
 document.getElementById('nextMatchBtn').addEventListener('click', () => {
-    document.getElementById('gameOver').style.display = 'none';
-    gameContainer.style.opacity = '1';
-    
-    if (!tournament.isActive) {
-        // Tournament is complete, return to menu
-        resetTournament();
-        document.getElementById('tournamentModal').style.display = 'none';
-        gameContainer.style.display = 'none';
-        landingPage.style.display = 'flex';
-    } else if (tournament.roundWinners.length === 2) {
-        // Start final match
-        startTournamentMatch(tournament.roundWinners[0], tournament.roundWinners[1]);
-    } else {
-        // Start next semi-final match
-        const nextMatch = tournament.matches[tournament.currentMatchIndex];
-        if (nextMatch) {
-            startTournamentMatch(nextMatch.player1, nextMatch.player2);
-        }
-    }
+	document.getElementById('gameOver').style.display = 'none';
+	gameContainer.style.opacity = '1';
+
+	if (!tournament.isActive) {
+		// Tournament is complete, return to menu
+		resetTournament();
+		document.getElementById('tournamentModal').style.display = 'none';
+		gameContainer.style.display = 'none';
+		landingPage.style.display = 'flex';
+	} else if (tournament.roundWinners.length === 2) {
+		// Start final match
+		startTournamentMatch(tournament.roundWinners[0], tournament.roundWinners[1]);
+	} else {
+		// Start next semi-final match
+		const nextMatch = tournament.matches[tournament.currentMatchIndex];
+		if (nextMatch) {
+			startTournamentMatch(nextMatch.player1, nextMatch.player2);
+		}
+	}
 });
 
 // Helper Functions
 function updatePlayersList() {
-    const list = document.getElementById('playersList');
-    list.innerHTML = '';
-    
-    tournament.players.forEach((player, index) => {
-        const li = document.createElement('li');
-        li.textContent = `${index + 1}. ${player}`;
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => {
+	const list = document.getElementById('playersList');
+	list.innerHTML = '';
+
+	tournament.players.forEach((player, index) => {
+		const li = document.createElement('li');
+		li.textContent = `${index + 1}. ${player}`;
+
+		const removeButton = document.createElement('button');
+		removeButton.textContent = 'Remove';
+		removeButton.className = 'remove-btn';
+		removeButton.addEventListener('click', () => {
             tournament.players.splice(index, 1);
-            updatePlayersList();
-            // Re-enable add button if below max
-            document.getElementById('addPlayerBtn').disabled = tournament.players.length >= 4;
-            // Update start button based on valid player count
-            const validPlayerCount = [4].includes(tournament.players.length);
-            document.getElementById('startTournamentBtn').disabled = !validPlayerCount;
-        };
-        li.appendChild(removeBtn);
-        list.appendChild(li);
-    });
+			updatePlayersList();
+			// Re-enable add button if below max
+			document.getElementById('addPlayerBtn').disabled = tournament.players.length >= 4;
+			// Update start button based on valid player count
+			const validPlayerCount = [4].includes(tournament.players.length);
+			document.getElementById('startTournamentBtn').disabled = !validPlayerCount;
+		});
+		li.appendChild(removeButton);
+		list.appendChild(li);
+	});
 }
 
 function initializeTournament() {
-    tournament.isActive = true;
-    tournament.currentMatchIndex = 0;
-    tournament.matches = [];
-    tournament.roundWinners = [];
-    
-    // Create semi-final matches (always 2 matches)
-    tournament.matches = [
-        {
-            round: 1,
-            player1: tournament.players[0],
-            player2: tournament.players[1]
-        },
-        {
-            round: 1,
-            player1: tournament.players[2],
-            player2: tournament.players[3]
-        }
-    ];
-    
-    updateBracketDisplay();
-    showCurrentMatch();
+	tournament.isActive = true;
+	tournament.currentMatchIndex = 0;
+	tournament.matches = [];
+	tournament.roundWinners = [];
+
+	// Create semi-final matches (always 2 matches)
+	tournament.matches = [
+		{
+			round: 1,
+			player1: tournament.players[0],
+			player2: tournament.players[1]
+		},
+		{
+			round: 1,
+			player1: tournament.players[2],
+			player2: tournament.players[3]
+		}
+	];
+
+	updateBracketDisplay();
+	showCurrentMatch();
 }
 
 function showCurrentMatch() {
-    const currentMatch = tournament.matches[tournament.currentMatchIndex];
-    if (currentMatch) {
-        document.getElementById('currentMatch').style.display = 'block';
-        document.getElementById('player1Name').textContent = currentMatch.player1;
-        document.getElementById('player2Name').textContent = currentMatch.player2;
-        
-        // Also update the game display names
-        document.getElementById('Name1').textContent = currentMatch.player1;
-        document.getElementById('Name2').textContent = currentMatch.player2;
-    }
+	const currentMatch = tournament.matches[tournament.currentMatchIndex];
+	if (currentMatch) {
+		document.getElementById('currentMatch').style.display = 'block';
+		document.getElementById('player1Name').textContent = currentMatch.player1;
+		document.getElementById('player2Name').textContent = currentMatch.player2;
+
+		// Also update the game display names
+		document.getElementById('Name1').textContent = currentMatch.player1;
+		document.getElementById('Name2').textContent = currentMatch.player2;
+	}
 }
 
 function resetTournament() {
-    tournament.isActive = false;
-    tournament.currentMatchIndex = 0;
-    tournament.players = [];
-    tournament.matches = [];
-    tournament.roundWinners = [];
-    document.getElementById('startTournamentBtn').disabled = true;
-    document.getElementById('addPlayerBtn').disabled = false;
-    document.getElementById('playersList').innerHTML = '';
-    document.getElementById('currentMatch').style.display = 'none';
-    document.getElementById('bracketContainer').innerHTML = '';
-    document.querySelector('.tournament-setup').style.display = 'block';
-    document.querySelector('.tournament-bracket').style.display = 'none';
+	tournament.isActive = false;
+	tournament.currentMatchIndex = 0;
+	tournament.players = [];
+	tournament.matches = [];
+	tournament.roundWinners = [];
+	document.getElementById('startTournamentBtn').disabled = true;
+	document.getElementById('addPlayerBtn').disabled = false;
+	document.getElementById('playersList').innerHTML = '';
+	document.getElementById('currentMatch').style.display = 'none';
+	document.getElementById('bracketContainer').innerHTML = '';
+	document.querySelector('.tournament-setup').style.display = 'block';
+	document.querySelector('.tournament-bracket').style.display = 'none';
 }
 
 function startTournamentMatch(player1Name, player2Name) {
-    document.getElementById('tournamentModal').style.display = 'none';
-    gameContainer.style.display = 'flex';
-    gameStarted = true;
-    playerVSplayer = true;
-    isGameOver = false;
-    isPaused = false;
-    resultSaved = false;
-    
-    // Ensure player names are strings
-    const name1 = String(player1Name);
-    const name2 = String(player2Name);
+	document.getElementById('tournamentModal').style.display = 'none';
+	gameContainer.style.display = 'flex';
+	gameStarted = true;
+	playerVSplayer = true;
+	isGameOver = false;
+	isPaused = false;
+	resultSaved = false;
 
-    // Update player names
-    document.getElementById('Name1').textContent = name1;
-    document.getElementById('Name2').textContent = name2;
-    
-    // Reset scores and positions
-    player1.score = 0;
-    player2.score = 0;
-    document.getElementById('Player_1').innerHTML = '0';
-    document.getElementById('Player_2').innerHTML = '0';
-    
-    resetBall(ball);
-    resetPosition(player1, player2);
-    
-    // Store the current match players for reference
-    tournament.currentPlayers = {
-        player1: name1,
-        player2: name2
-    };
+	// Ensure player names are strings
+	const name1 = String(player1Name);
+	const name2 = String(player2Name);
+
+	// Update player names
+	document.getElementById('Name1').textContent = name1;
+	document.getElementById('Name2').textContent = name2;
+
+	// Reset scores and positions
+	player1.score = 0;
+	player2.score = 0;
+	document.getElementById('Player_1').innerHTML = '0';
+	document.getElementById('Player_2').innerHTML = '0';
+
+	resetBall(ball);
+	resetPosition(player1, player2);
+
+	// Store the current match players for reference
+	tournament.currentPlayers = {
+		player1: name1,
+		player2: name2
+	};
 }
 
 function updateBracketDisplay() {
-    const container = document.getElementById('bracketContainer');
-    container.innerHTML = '';
-    
-    // Display semi-finals matches
-    const round1Div = document.createElement('div');
-    round1Div.className = 'tournament-round';
-    round1Div.innerHTML = '<h3>Semi-Finals</h3>';
-    
-    // Display first round/semi-final matches with winners highlighted
-    tournament.matches.forEach((match, index) => {
-        if (match.round === 1) {
-            const matchDiv = document.createElement('div');
-            matchDiv.className = 'match-pair';
-            let matchText = `${match.player1} vs ${match.player2}`;
-            
-            // Highlight winner if there is one
-            if (tournament.roundWinners[index]) {
-                matchText += ` (Winner: ${tournament.roundWinners[index]})`;
-            }
-            
-            matchDiv.innerHTML = matchText;
-            round1Div.appendChild(matchDiv);
-        }
-    });
-    container.appendChild(round1Div);
+	const container = document.getElementById('bracketContainer');
+	container.innerHTML = '';
 
-    // Display finals if we have both semi-final winners
-    if (tournament.roundWinners.length >= 2) {
-        const finalsDiv = document.createElement('div');
-        finalsDiv.className = 'tournament-round';
-        finalsDiv.innerHTML = '<h3>Finals</h3>';
-        
-        // Create finals match display
-        let finalsText = `${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
-        if (tournament.roundWinners.length === 3) {
-            finalsText += ` (Winner: ${tournament.roundWinners[2]})`;
-        }
-        finalsDiv.innerHTML += `<div class="match-pair">${finalsText}</div>`;
-        container.appendChild(finalsDiv);
-    }
+	// Display semi-finals matches
+	const round1Div = document.createElement('div');
+	round1Div.className = 'tournament-round';
+	round1Div.innerHTML = '<h3>Semi-Finals</h3>';
 
-    // Display tournament champion if we have one
-    if (tournament.roundWinners.length === 3) {
-        const winnerDiv = document.createElement('div');
-        winnerDiv.className = 'tournament-round';
-        winnerDiv.innerHTML = '<h3>Tournament Champion</h3>';
-        winnerDiv.innerHTML += `<div class="match-pair winner">${tournament.roundWinners[2]}</div>`;
-        container.appendChild(winnerDiv);
-    }
+	// Display first round/semi-final matches with winners highlighted
+	tournament.matches.forEach((match, index) => {
+		if (match.round === 1) {
+			const matchDiv = document.createElement('div');
+			matchDiv.className = 'match-pair';
+			let matchText = `${match.player1} vs ${match.player2}`;
+
+			// Highlight winner if there is one
+			if (tournament.roundWinners[index]) {
+				matchText += ` (Winner: ${tournament.roundWinners[index]})`;
+			}
+
+			matchDiv.innerHTML = matchText;
+			round1Div.appendChild(matchDiv);
+		}
+	});
+	container.appendChild(round1Div);
+
+	// Display finals if we have both semi-final winners
+	if (tournament.roundWinners.length >= 2) {
+		const finalsDiv = document.createElement('div');
+		finalsDiv.className = 'tournament-round';
+		finalsDiv.innerHTML = '<h3>Finals</h3>';
+
+		// Create finals match display
+		let finalsText = `${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
+		if (tournament.roundWinners.length === 3) {
+			finalsText += ` (Winner: ${tournament.roundWinners[2]})`;
+		}
+		finalsDiv.innerHTML += `<div class="match-pair">${finalsText}</div>`;
+		container.appendChild(finalsDiv);
+	}
+
+	// Display tournament champion if we have one
+	if (tournament.roundWinners.length === 3) {
+		const winnerDiv = document.createElement('div');
+		winnerDiv.className = 'tournament-round';
+		winnerDiv.innerHTML = '<h3>Tournament Champion</h3>';
+		winnerDiv.innerHTML += `<div class="match-pair winner">${tournament.roundWinners[2]}</div>`;
+		container.appendChild(winnerDiv);
+	}
 }
 
 function showGameOver(winner, score) {
-    isPaused = true;
-    
-    const gameOverScreen = document.getElementById('gameOver');
-    const finalScore = document.getElementById('finalScore');
-    const winnerText = document.getElementById('winnerText');
-    const playAgainBtn = document.getElementById('playAgain');
-    const returnToMenuBtn = document.getElementById('returnToMenu');
-    const nextMatchBtn = document.getElementById('nextMatchBtn');
-    
-    if (tournament.isActive) {
-        resultSaved = false;
-        playAgainBtn.style.display = 'none';
-        returnToMenuBtn.style.display = 'none';
-        nextMatchBtn.style.display = 'block';
-        
-        // Add winner to tournament progress
-        // Make sure we're using the correct player name from the current match
-        const currentMatch = tournament.matches[tournament.currentMatchIndex];
-        const winnerName = winner === "Player 1" ? currentMatch.player1 : currentMatch.player2;
-        tournament.roundWinners.push(winnerName); // Use the actual player name
-        
-        if (tournament.roundWinners.length === 2) {
-            // Create final match
-            tournament.matches.push({
-                round: 2,
-                player1: tournament.roundWinners[0],
-                player2: tournament.roundWinners[1]
-            });
-            winnerText.textContent = `${winnerName} wins this match!`;
-            finalScore.innerHTML = `Finals Match:<br>${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
-            nextMatchBtn.textContent = 'Start Finals';
-            if (!resultSaved) {
-                saveGameResult(winner);
-                resultSaved = true;
-            }
-        } else if (tournament.roundWinners.length === 3) {
-            // Tournament is complete
-            winnerText.textContent = `Tournament Champion: ${winnerName}!`;
-            finalScore.textContent = `Congratulations!`;
-            nextMatchBtn.textContent = 'Return to Menu';
-            if (!resultSaved) {
-                saveGameResult(winner);
-                resultSaved = true;
-            }
-            tournament.isActive = false;
-            // isPaused = false;
-        } else {
-            // More matches to play
-            tournament.currentMatchIndex++;
-            const nextMatch = tournament.matches[tournament.currentMatchIndex];
-            winnerText.textContent = `${winnerName} wins this match!`;
-            finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
-            nextMatchBtn.textContent = 'Next Match';
-            if (!resultSaved) {
-                saveGameResult(winner);
-                resultSaved = true;
-            }
-        }
+	isPaused = true;
 
-        // Update the bracket display immediately after updating winners
-        updateBracketDisplay();
-    } else {
-        // Regular game ended
-        winnerText.textContent = `${winner} Wins!`;
-        finalScore.textContent = `Final Score: ${score}`;
-        playAgainBtn.style.display = 'block';
-        returnToMenuBtn.style.display = 'block';
-        nextMatchBtn.style.display = 'none';
-    }
-    
-    gameOverScreen.style.display = 'flex';
-    gameContainer.style.opacity = '0.5';
-    
-    if (!tournament.isActive && !resultSaved) {
-        saveGameResult(winner);
-        resultSaved = true;
-    }
+	const gameOverScreen = document.getElementById('gameOver');
+	const finalScore = document.getElementById('finalScore');
+	const winnerText = document.getElementById('winnerText');
+	const playAgainBtn = document.getElementById('playAgain');
+	const returnToMenuBtn = document.getElementById('returnToMenu');
+	const nextMatchBtn = document.getElementById('nextMatchBtn');
+
+	if (tournament.isActive) {
+		resultSaved = false;
+		playAgainBtn.style.display = 'none';
+		returnToMenuBtn.style.display = 'none';
+		nextMatchBtn.style.display = 'block';
+
+		// Add winner to tournament progress
+		const currentMatch = tournament.matches[tournament.currentMatchIndex];
+		// Get the actual names currently displayed in the game
+		const displayedPlayer1 = document.getElementById('Name1').textContent;
+		const displayedPlayer2 = document.getElementById('Name2').textContent;
+		const winnerName = winner === "Player 1" ? displayedPlayer1 : displayedPlayer2;
+		tournament.roundWinners.push(winnerName);
+
+		if (tournament.roundWinners.length === 2) {
+			// Create final match
+			tournament.matches.push({
+				round: 2,
+				player1: tournament.roundWinners[0],
+				player2: tournament.roundWinners[1]
+			});
+			winnerText.textContent = `${winnerName} wins this match!`;
+			finalScore.innerHTML = `Finals Match:<br>${tournament.roundWinners[0]} vs ${tournament.roundWinners[1]}`;
+			nextMatchBtn.textContent = 'Start Finals';
+			if (!resultSaved) {
+				saveGameResult(winner);
+				resultSaved = true;
+			}
+		} else if (tournament.roundWinners.length === 3) {
+			// Tournament is complete
+			const championName = tournament.roundWinners[2]; // Use the actual winner name from roundWinners
+			winnerText.textContent = `Tournament Champion: ${championName}`;
+			finalScore.textContent = `Congratulations!`;
+			nextMatchBtn.textContent = 'Return to Menu';
+			if (!resultSaved) {
+				saveGameResult(winner);
+				resultSaved = true;
+			}
+			tournament.isActive = false;
+		} else {
+			// More matches to play
+			tournament.currentMatchIndex++;
+			const nextMatch = tournament.matches[tournament.currentMatchIndex];
+			winnerText.textContent = `${winnerName} wins this match!`;
+			finalScore.innerHTML = `Next Match:<br>${nextMatch.player1} vs ${nextMatch.player2}`;
+			nextMatchBtn.textContent = 'Next Match';
+			if (!resultSaved) {
+				saveGameResult(winner);
+				resultSaved = true;
+			}
+		}
+
+		// Update the bracket display immediately after updating winners
+		updateBracketDisplay();
+	} else {
+		// Regular game ended
+		winnerText.textContent = `${winner} Wins!`;
+		finalScore.textContent = `Final Score: ${score}`;
+		playAgainBtn.style.display = 'block';
+		returnToMenuBtn.style.display = 'block';
+		nextMatchBtn.style.display = 'none';
+	}
+
+	gameOverScreen.style.display = 'flex';
+	gameContainer.style.opacity = '0.5';
+
+	if (!tournament.isActive && !resultSaved) {
+		saveGameResult(winner);
+		resultSaved = true;
+	}
 }
