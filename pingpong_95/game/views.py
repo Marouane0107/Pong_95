@@ -87,6 +87,12 @@ class GameResultAPIView(APIView):
                     'player4_score': data.get('player4_score', 0)
                 })
 
+            if data['game_type'] == 'TRN':
+                game_fields.update({
+                    'is_tournament_match': True,
+                    'tournament_round': data.get('tournament_round', 1)
+                })
+            
             game_result = GameResult.objects.create(**game_fields)
             serializer = GameResultSerializer(game_result)
             return Response({

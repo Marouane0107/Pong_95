@@ -6,10 +6,11 @@ class GameResult(models.Model):
         ('PVB', 'Player vs Bot'),
         ('PVP', 'Player vs Player'),
         ('MP', 'Multiplayer'),
-        ('TRN', 'Tournament Match')
+        ('TRN', 'Tournament Match'),
+        ('OPVP', 'Online Player vs Player'),
     ]
 
-    game_type = models.CharField(max_length=3, choices=GAME_TYPES)
+    game_type = models.CharField(max_length=4, choices=GAME_TYPES)
     player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player1_games')
     player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player2_games', null=True, blank=True)
     player3 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='player3_games')
@@ -20,7 +21,9 @@ class GameResult(models.Model):
     player4_score = models.IntegerField(default=0)
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='won_games')
     timestamp = models.DateTimeField(auto_now_add=True)
+    # Tournament fields
     is_tournament_match = models.BooleanField(default=False)
+    tournament_stage = models.CharField(max_length=10, null=True, blank=True)
     tournament_round = models.IntegerField(null=True, blank=True)
 
     def __str__(self):

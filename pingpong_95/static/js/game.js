@@ -20,6 +20,7 @@ let multiplayer = false;
 let lastHit = null;
 let isGameOver = false;
 let resultSaved = false;
+let isMatchmaking = false;
 
 // Get the initial canvas size (assuming canvas is already created in HTML)
 const canvasWidth = canvas.width;
@@ -55,11 +56,41 @@ const key_9 = 105;
 
 
 window.addEventListener('keydown', function(e) {
-	keysPressed[e.keyCode] = true;
+    if (isMatchmaking) {
+        // For matchmaking games, only handle controls for your assigned player
+        if (MatchmakingSystem.isPlayer1) {
+            if (e.keyCode === key_W) keysPressed[key_W] = true;
+            if (e.keyCode === key_S) keysPressed[key_S] = true;
+        } else {
+            if (e.keyCode === key_Up) keysPressed[key_Up] = true;
+            if (e.keyCode === key_Down) keysPressed[key_Down] = true;
+        }
+    } else {
+        // For local games, handle all controls
+        if (e.keyCode === key_W) keysPressed[key_W] = true;
+        if (e.keyCode === key_S) keysPressed[key_S] = true;
+        if (e.keyCode === key_Up) keysPressed[key_Up] = true;
+        if (e.keyCode === key_Down) keysPressed[key_Down] = true;
+    }
 });
 
 window.addEventListener('keyup', function(e) {
-	keysPressed[e.keyCode] = false;
+    if (isMatchmaking) {
+        // For matchmaking games, only handle controls for your assigned player
+        if (MatchmakingSystem.isPlayer1) {
+            if (e.keyCode === key_W) keysPressed[key_W] = false;
+            if (e.keyCode === key_S) keysPressed[key_S] = false;
+        } else {
+            if (e.keyCode === key_Up) keysPressed[key_Up] = false;
+            if (e.keyCode === key_Down) keysPressed[key_Down] = false;
+        }
+    } else {
+        // For local games, handle all controls
+        if (e.keyCode === key_W) keysPressed[key_W] = false;
+        if (e.keyCode === key_S) keysPressed[key_S] = false;
+        if (e.keyCode === key_Up) keysPressed[key_Up] = false;
+        if (e.keyCode === key_Down) keysPressed[key_Down] = false;
+    }
 });
 
 function vector(x, y)
@@ -71,6 +102,10 @@ function vector(x, y)
 document.querySelectorAll("button").forEach(button => {
 	QuitMenu.addEventListener('click', () => {
 		// Try different approaches to close the window
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't quit game in this mode, please finish the game first.");
+			return;
+		}
 		if (window.opener) {
 			window.close();
 		} else {
@@ -141,13 +176,21 @@ document.querySelectorAll("button").forEach(button => {
 	});
 	Restart.addEventListener("click", () => {
 		console.log("Restart button clicked");
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't restart game in this mode, please finish the game first.");
+			return;
+		}
 		// saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
 		resetBall(ball);
 		setAlltoZero();
 	});
 	Menu.addEventListener("click", () => {
-		resetBall(ball);
 		console.log("Menu button clicked");
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't return to menu in this mode, please finish the game first.");
+			return;
+		}
+		resetBall(ball);
 		// saveInterruptedGame('Return to Menu before the game over');
 		setAlltoZero();
 		landingPage.style.display = 'flex'; // Show landing page
@@ -305,13 +348,14 @@ function Score(ball, player1, player2) {
 	}
 
 	// Check if a player has won
-	if (player1.score === 10 || player2.score === 10) {
+	if (player1.score === 5 || player2.score === 5) // increase the score to 10 when finsihing the testing
+	{
 		if (gameSettings.soundEnabled) {
 			scoreSound.currentTime = 0;
 			scoreSound.volume = gameSettings.soundVolume;
 			scoreSound.play().catch(error => console.log("Audio play failed:", error));
 		}
-		gameOver(player1.score === 10 ? "Player 1" : "Player 2");
+		gameOver(player1.score === 5 ? "Player 1" : "Player 2");
 		return;
 	}
 }
@@ -924,6 +968,7 @@ function saveSettings() {
 
 // Show/Hide Settings Menu
 function showSettingsMenu() {
+	if (isMatchmaking) return; // Prevent opening settings during matchmaking
 	document.getElementById('settingsMenu').style.display = 'block';
 	isPaused = true; // Pause the game when settings are open
 }
@@ -1001,81 +1046,83 @@ function getCsrfToken() {
 
 
 async function saveGameResult(winner) {
-	const csrfToken = getCsrfToken();
+    const csrfToken = getCsrfToken();
 
-	const isTournamentFinal = tournament.isActive && tournament.roundWinners.length === 3;
-	let gameType;
-	if (tournament.isActive) {
-		gameType = 'TRN';  // Tournament game
-	} else {
-		gameType = playerVSbot ? 'PVB' : playerVSplayer ? 'PVP' : 'MP';
-	}
+    // Determine game type
+    let gameType = tournament.isActive ? 'TRN' : 
+					isMatchmaking ? 'OPVP' : 
+                	playerVSbot ? 'PVB' : 
+                	playerVSplayer ? 'PVP' : 'MP';
 
-	// Get player usernames from the DOM
-	const player1_username = document.getElementById('Name1').textContent;
-	const player2_username = document.getElementById('Name2').textContent;
-	const player3_username = document.getElementById('Name3').textContent;
-	const player4_username = document.getElementById('Name4').textContent;
-
-	const player1_score = player1.score;
-	const player2_score = player2.score;
-	const player3_score = player3.score;
-	const player4_score = player4.score;
-
-	// Determine the winner
+	// For matchmaking games, use "Player 1" and "Player 2" instead of "You" and "Opponent"
+	const player1_name = isMatchmaking ? "Player 1" : document.getElementById('Name1').textContent;
+	const player2_name = isMatchmaking ? "Player 2" : document.getElementById('Name2').textContent;
+	
+	// Determine winner number based on the game type
 	let winnerNumber;
-	if (winner === "Player 1") {
-		winnerNumber = 1;
-	} else if (winner === "Player 2") {
-		winnerNumber = 2;
-	} else if (winner === "Player 3") {
-		winnerNumber = 3;
-	} else if (winner === "Player 4") {
-		winnerNumber = 4;
-	}
+	if (isMatchmaking) {
+		winnerNumber = winner === "Player 1" ? 1 : 2;
+	} else {
+		// For other game types, use the existing logic
+        winnerNumber = winner === "Player 1" ? 1 : 
+		winner === "Player 2" ? 2 : 
+		winner === "Player 3" ? 3 : 
+		winner === "Player 4" ? 4 : null;
+    }
 
-	// Determine tournament round
+	// Determine tournament stage and round
+	let tournamentStage = null;
 	let tournamentRound = null;
-	if (tournament.isActive || isTournamentFinal) {
-		tournamentRound = tournament.roundWinners.length <= 2 ? 1 : 2;
-	}
+	
+	if (tournament.isActive) {
+        // Determine stage and round based on tournament progress
+        if (tournament.roundWinners.length <= 2) {
+            tournamentStage = 'semifinal';
+            tournamentRound = tournament.currentMatchIndex;
+        } else {
+            tournamentStage = 'final';
+            tournamentRound = 3; // Final round is always 3
+        }
+    }
 
-	const data = {
-		game_type: gameType,
-		player1: player1_username,
-		player2: player2_username,
-		player3: player3_username,
-		player4: player4_username,
-		player1_score: player1_score,
-		player2_score: player2_score,
-		player3_score: player3_score,
-		player4_score: player4_score,
-		winner: winnerNumber,
-		is_tournament_match: Boolean(tournament.isActive || isTournamentFinal),
-		tournament_round: tournamentRound
-	};
+    const data = {
+        game_type: gameType,
+        player1: player1_name,
+        player2: player2_name,
+        player3: document.getElementById('Name3')?.textContent || '',
+        player4: document.getElementById('Name4')?.textContent || '',
+        player1_score: player1.score,
+        player2_score: player2.score,
+        player3_score: player3?.score || 0,
+        player4_score: player4?.score || 0,
+        winner: winnerNumber,
+		// Tournament fields
+        is_tournament_match: tournament.isActive,
+        tournament_stage: tournamentStage,
+        tournament_round: tournamentRound
 
-	try {
-		const response = await fetch('/api/game-results/', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': csrfToken
-			},
-			body: JSON.stringify(data)
-		});
+    };
 
-		if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		}
+    try {
+        const response = await fetch('/api/game-results/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
 
-		const result = await response.json();
-		console.log('Game result saved successfully:', result);
-		resultSaved = true;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-	} catch (error) {
-		console.error('Failed to save game result:', error);
-	}
+        const result = await response.json();
+        console.log('Game result saved successfully:', result);
+        resultSaved = true;
+    } catch (error) {
+        console.error('Failed to save game result:', error);
+    }
 }
 
 // this function to save interrupted game data
@@ -1473,7 +1520,26 @@ function showGameOver(winner, score) {
 
 		// Update the bracket display immediately after updating winners
 		updateBracketDisplay();
-	} else {
+	}
+	// Matchmaking game ended
+	else if (isMatchmaking) {
+		// Determine display name based on player role and winner
+		const displayWinner = (winner === "Player 1" && MatchmakingSystem.isPlayer1) || 
+							 (winner === "Player 2" && !MatchmakingSystem.isPlayer1) ? 
+							 "You" : "Opponent";
+
+		winnerText.textContent = `${displayWinner} win!`;
+		if (displayWinner === "You") {
+			finalScore.textContent = `Congratulations!`;
+		} else {
+			finalScore.textContent = `Better luck next time!`;
+		}
+		nextMatchBtn.textContent = 'Return to Menu';
+		nextMatchBtn.style.display = 'block';
+		playAgainBtn.style.display = 'none';
+		returnToMenuBtn.style.display = 'none';
+		isMatchmaking = false;
+	}else {
 		// Regular game ended
 		winnerText.textContent = `${winner} Wins!`;
 		finalScore.textContent = `Final Score: ${score}`;
@@ -1490,3 +1556,227 @@ function showGameOver(winner, score) {
 		resultSaved = true;
 	}
 }
+
+// matchmaking system ----------------------------------------------------------------
+
+// Get elements
+const matchmakingButton = document.getElementById("Matchmaking");
+const matchmakingStatus = document.getElementById("matchmakingStatus");
+
+// Matchmaking System
+const MatchmakingSystem = {
+    socket: null,
+    gameChannel: null,
+    isInQueue: false,
+    isPlayer1: false,
+
+    connect() {
+		return new Promise((resolve) => {
+        this.socket = new WebSocket(`ws://${window.location.host}/ws/matchmaking/`);
+        
+        this.socket.onopen = () => {
+            console.log("Connected to matchmaking server");
+            matchmakingStatus.textContent = "Searching for opponent...";
+			resolve(); // Resolve the promise when connection is established
+        };
+        
+        this.socket.onclose = () => {
+            console.log("Disconnected from matchmaking");
+            matchmakingStatus.style.display = "none";
+            this.isInQueue = false;
+        };
+        
+        this.socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+            matchmakingStatus.textContent = "Connection error. Please try again.";
+            matchmakingStatus.style.display = "block";
+        };
+        
+        this.socket.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            if (data.type === "match_found") {
+                console.log("Match found:", data);
+                this.startGame(data.room_name, data.role);
+            }
+        };
+		});
+    },
+
+    startGame(room_name, role) {
+		isMatchmaking = true;
+		this.isInQueue = false;
+        this.isPlayer1 = role === "player1";
+        this.gameChannel = new WebSocket(`ws://${window.location.host}/ws/game/${room_name}/`);
+        
+        this.gameChannel.onopen = () => {
+            console.log("Connected to game channel");
+            matchmakingStatus.style.display = 'none';
+            landingPage.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            
+            // Initialize game state
+            gameStarted = true;
+            playerVSplayer = true;
+            isGameOver = false;
+            isPaused = false;
+            
+            // Reset scores and positions
+            resetBall(ball);
+            resetPosition(player1, player2);
+            player1.score = 0;
+            player2.score = 0;
+            document.getElementById("Player_1").innerHTML = "0";
+            document.getElementById("Player_2").innerHTML = "0";
+            
+            // Set player names
+            document.getElementById("Name1").innerHTML = this.isPlayer1 ? "You" : "Opponent";
+            document.getElementById("Name2").innerHTML = this.isPlayer1 ? "Opponent" : "You";
+            
+            // Start game loop for both players
+            this.sendGameState();
+        };
+
+        this.gameChannel.onmessage = (e) => {
+			const data = JSON.parse(e.data);
+			if (data.type === 'game_state') {
+				this.updateGameState(data.state);
+			} else if (data.type === 'player_left') {
+				this.handlePlayerLeave();
+			}
+		};
+
+		// Handle player disconnection
+		this.gameChannel.onclose = (e) => {
+			console.log("Game channel closed", e);
+			if (!isGameOver) {
+				// Notify the server that this player has left
+				if (this.socket?.readyState === WebSocket.OPEN) {
+					this.socket.send(JSON.stringify({
+						action: "player_left",
+						room_name: room_name
+					}));
+				}
+				this.handlePlayerLeave();
+			}
+		};
+
+		this.gameChannel.onerror = (error) => {
+			console.error("Game channel error:", error);
+			this.handlePlayerLeave();
+		};
+    },
+
+	handlePlayerLeave() {
+		if (!isGameOver) {
+			isGameOver = true;
+			gameStarted = false;
+			isPaused = true;
+	
+			// determen the winner based on who left you or opponent
+			const winner = this.isPlayer1 ? "Player 1" : "Player 2";
+			console.log(`${winner} wins! Opponent left the game.`);
+
+			// Show game over screen
+			const displayedPlayer1 = "Player 1";
+			const displayedPlayer2 = "Player 2";
+			showGameOver(winner, this.isPlayer1 ? player1.score : player2.score);
+			
+			// Clean up WebSocket connections
+			if (this.gameChannel) {
+				this.gameChannel.close();
+				this.gameChannel = null;
+			}
+			if (this.socket) {
+				this.socket.close();
+				this.socket = null;
+			}
+	
+			// Reset game state
+			this.isInQueue = false;
+			this.isPlayer1 = false;
+		}
+	},
+
+    sendGameState() {
+		if (!gameStarted || isGameOver || isPaused) {
+			return; // Stop sending game state if game is not active
+		}
+        if (this.gameChannel?.readyState === WebSocket.OPEN) {
+            const gameState = {
+                type: 'game_state',
+                state: {
+                    player1Pos: player1.pos,
+                    player2Pos: player2.pos,
+                    ball: this.isPlayer1 ? {
+                        pos: ball.pos,
+                        speed: ball.speed
+                    } : null
+                }
+            };
+            console.log("Sending game state:", gameState); // Debugging
+            this.gameChannel.send(JSON.stringify(gameState));
+        }
+		else {
+			// Channel is not open, handle disconnection
+			this.handlePlayerLeave();
+			return;
+		}
+        // Only schedule next frame if game is still active
+        if (gameStarted && !isGameOver && !isPaused) {
+            requestAnimationFrame(() => this.sendGameState());
+        }
+    },
+
+    updateGameState(state) {
+        console.log("Received game state:", state); // Debugging
+        if (!state) return;
+
+        // Update paddle positions
+        if (state.player1Pos) {
+            player1.pos = state.player1Pos;
+        }
+        if (state.player2Pos) {
+            player2.pos = state.player2Pos;
+        }
+
+        // Update ball state (only for player2)
+        if (!this.isPlayer1 && state.ball) {
+            ball.pos = state.ball.pos || ball.pos;
+            ball.speed = state.ball.speed || ball.speed;
+        }
+    },
+
+    joinQueue() {
+        if (this.socket?.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({
+                action: "join_queue"
+            }));
+            this.isInQueue = true;
+            matchmakingStatus.textContent = "Searching for opponent...";
+            matchmakingStatus.style.display = "block";
+        }
+    }
+};
+
+// Handle matchmaking button click
+document.getElementById("Matchmaking").addEventListener("click", async () => {
+    if (!MatchmakingSystem.socket || MatchmakingSystem.socket.readyState !== WebSocket.OPEN) {
+        await MatchmakingSystem.connect(); // Wait for connection to establish
+    }
+    if (MatchmakingSystem.socket?.readyState === WebSocket.OPEN) {
+        MatchmakingSystem.joinQueue();
+    }
+});
+
+// Add window close handlers
+window.addEventListener('beforeunload', (e) => {
+    if (isMatchmaking && !isGameOver) {
+        // Force handlePlayerLeave to execute before window closes
+        if (MatchmakingSystem.gameChannel) {
+            MatchmakingSystem.gameChannel.send(JSON.stringify({
+                type: 'player_left'
+            }));
+        }
+        MatchmakingSystem.handlePlayerLeave();
+    }
+});
