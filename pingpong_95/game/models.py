@@ -24,7 +24,6 @@ class GameResult(models.Model):
     # Tournament fields
     is_tournament_match = models.BooleanField(default=False)
     tournament_stage = models.CharField(max_length=10, null=True, blank=True)
-    tournament_round = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.game_type} Game - {self.timestamp}"

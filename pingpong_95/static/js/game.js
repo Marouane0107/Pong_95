@@ -1072,16 +1072,13 @@ async function saveGameResult(winner) {
 
 	// Determine tournament stage and round
 	let tournamentStage = null;
-	let tournamentRound = null;
 	
 	if (tournament.isActive) {
         // Determine stage and round based on tournament progress
         if (tournament.roundWinners.length <= 2) {
             tournamentStage = 'semifinal';
-            tournamentRound = tournament.currentMatchIndex;
         } else {
             tournamentStage = 'final';
-            tournamentRound = 3; // Final round is always 3
         }
     }
 
@@ -1098,9 +1095,7 @@ async function saveGameResult(winner) {
         winner: winnerNumber,
 		// Tournament fields
         is_tournament_match: tournament.isActive,
-        tournament_stage: tournamentStage,
-        tournament_round: tournamentRound
-
+        tournament_stage: tournamentStage
     };
 
     try {
@@ -1125,42 +1120,6 @@ async function saveGameResult(winner) {
     }
 }
 
-// this function to save interrupted game data
-function saveInterruptedGame(reason) {
-	// Only save if game has actually started and there's been some progress
-	if (!gameStarted || resultSaved) return;
-	// Determine actual game type
-	let currentGameType;
-	if (playerVSbot) {
-		currentGameType = 'PVB';
-	} else if (multiplayer) {
-		currentGameType = 'MP';
-	} else if (playerVSplayer) {
-		currentGameType = 'PVP';
-	} else {
-		return; // Don't save if no valid game type
-	}
-
-	// Get current scores based on game type
-	const gameData = {
-		game_type: currentGameType,
-		player1_score: currentGameType === 'MP' ? player_1.score : player1.score,
-		player2_score: currentGameType === 'MP' ? player_2.score : player2.score,
-		player3_score: currentGameType === 'MP' ? player3.score : 0,
-		player4_score: currentGameType === 'MP' ? player4.score : 0,
-		winner: 'none'
-	};
-
-	// Check if any scoring has occurred
-	const hasScores = Object.values(gameData)
-		.filter(value => typeof value === 'number')
-		.some(score => score > 0);
-
-	if (hasScores || reason === 'browser_close') {
-		console.log(`Game interrupted (${reason}):`, gameData);
-		saveGameResult(gameData);
-			}
-}
 
 function loop()
 {
@@ -1563,6 +1522,11 @@ function showGameOver(winner, score) {
 const matchmakingButton = document.getElementById("Matchmaking");
 const matchmakingStatus = document.getElementById("matchmakingStatus");
 
+// Add lerp helper function for smooth interpolation
+function lerp(start, end, t) {
+    return start * (1 - t) + end * t;
+}
+
 // Matchmaking System
 const MatchmakingSystem = {
     socket: null,
@@ -1698,53 +1662,53 @@ const MatchmakingSystem = {
 	},
 
     sendGameState() {
-		if (!gameStarted || isGameOver || isPaused) {
-			return; // Stop sending game state if game is not active
+		if (!gameStarted || isGameOver || isPaused) return;
+		
+		// Increase update rate to 120 updates/second (8.33ms)
+		const UPDATE_INTERVAL = 8.33;
+		
+		if (!this.lastSend || Date.now() - this.lastSend >= UPDATE_INTERVAL) {
+			if (this.gameChannel?.readyState === WebSocket.OPEN) {
+				const gameState = {
+					type: 'game_state',
+					state: {
+						player1Pos: player1.pos,
+						player2Pos: player2.pos,
+						ball: this.isPlayer1 ? {
+							pos: ball.pos,
+							speed: ball.speed
+						} : null
+					}
+				};
+				this.gameChannel.send(JSON.stringify(gameState));
+				this.lastSend = Date.now();
+			}
 		}
-        if (this.gameChannel?.readyState === WebSocket.OPEN) {
-            const gameState = {
-                type: 'game_state',
-                state: {
-                    player1Pos: player1.pos,
-                    player2Pos: player2.pos,
-                    ball: this.isPlayer1 ? {
-                        pos: ball.pos,
-                        speed: ball.speed
-                    } : null
-                }
-            };
-            console.log("Sending game state:", gameState); // Debugging
-            this.gameChannel.send(JSON.stringify(gameState));
-        }
-		else {
-			// Channel is not open, handle disconnection
-			this.handlePlayerLeave();
-			return;
-		}
-        // Only schedule next frame if game is still active
-        if (gameStarted && !isGameOver && !isPaused) {
-            requestAnimationFrame(() => this.sendGameState());
-        }
-    },
+		requestAnimationFrame(() => this.sendGameState());
+	},
 
     updateGameState(state) {
-        console.log("Received game state:", state); // Debugging
-        if (!state) return;
-
-        // Update paddle positions
-        if (state.player1Pos) {
-            player1.pos = state.player1Pos;
-        }
-        if (state.player2Pos) {
-            player2.pos = state.player2Pos;
-        }
-
-        // Update ball state (only for player2)
-        if (!this.isPlayer1 && state.ball) {
-            ball.pos = state.ball.pos || ball.pos;
-            ball.speed = state.ball.speed || ball.speed;
-        }
-    },
+		if (!state) return;
+		
+		// Use a higher LERP_FACTOR for paddles to reduce lag
+		const PADDLE_LERP_FACTOR = 0.9; // Increased from 0.8 to 0.9
+		const BALL_LERP_FACTOR = 0.8;  // Keep ball smoothing at 0.8
+		
+		// Smooth paddle position updates
+		if (state.player1Pos && !this.isPlayer1) { // Only update opponent's paddle
+			player1.pos.y = lerp(player1.pos.y, state.player1Pos.y, PADDLE_LERP_FACTOR);
+		}
+		if (state.player2Pos && this.isPlayer1) { // Only update opponent's paddle
+			player2.pos.y = lerp(player2.pos.y, state.player2Pos.y, PADDLE_LERP_FACTOR);
+		}
+		
+		// Update ball state (only for player2)
+		if (!this.isPlayer1 && state.ball) {
+			ball.pos.x = lerp(ball.pos.x, state.ball.pos.x, BALL_LERP_FACTOR);
+			ball.pos.y = lerp(ball.pos.y, state.ball.pos.y, BALL_LERP_FACTOR);
+			ball.speed = state.ball.speed;
+		}
+	},
 
     joinQueue() {
         if (this.socket?.readyState === WebSocket.OPEN) {

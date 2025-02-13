@@ -90,7 +90,7 @@ class GameResultAPIView(APIView):
             if data['game_type'] == 'TRN':
                 game_fields.update({
                     'is_tournament_match': True,
-                    'tournament_round': data.get('tournament_round', 1)
+                    'tournament_stage': data.get('tournament_stage', 'Group')
                 })
             
             game_result = GameResult.objects.create(**game_fields)

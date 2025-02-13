@@ -212,7 +212,6 @@ button:disabled {
     padding: 0; /* Remove any default padding */
     margin: 0;
     border: none;
-    width: 100%;
 }
 
 /* Game Container */
