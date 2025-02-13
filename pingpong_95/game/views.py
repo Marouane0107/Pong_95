@@ -61,7 +61,7 @@ class GameResultAPIView(APIView):
 
             # Get or create players
             players = {}
-            for i in range(1, 5):
+            for i in range(1, 3):
                 username = data[f'player{i}']
                 players[str(i)] = User.objects.get_or_create(username=username)[0]
 
@@ -76,16 +76,9 @@ class GameResultAPIView(APIView):
                 'player1_score': data['player1_score'],
                 'player2': players['2'],
                 'player2_score': data['player2_score'],
-                'winner': winner
+                'winner': winner,
+                'timestamp': data.get('timestamp', None)
             }
-
-            if data['game_type'] == 'MP':
-                game_fields.update({
-                    'player3': players['3'],
-                    'player4': players['4'],
-                    'player3_score': data.get('player3_score', 0),
-                    'player4_score': data.get('player4_score', 0)
-                })
 
             if data['game_type'] == 'TRN':
                 game_fields.update({

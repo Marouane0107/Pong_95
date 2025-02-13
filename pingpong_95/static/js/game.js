@@ -452,7 +452,8 @@ function resetPosition(player1, player2) {
 
 document.getElementById('playAgain').addEventListener('click', () => {
 	document.getElementById('gameOver').style.display = 'none';
-	gameContainer.style.opacity = '1';
+	document.getElementById('gameContainer').style.opacity = '1'; // Reset opacity
+	// gameContainer.style.opacity = '1';
 	isGameOver = false;
 	isPaused = false;
 	gameStarted = true;
@@ -462,7 +463,8 @@ document.getElementById('playAgain').addEventListener('click', () => {
 
 document.getElementById('returnToMenu').addEventListener('click', () => {
 	document.getElementById('gameOver').style.display = 'none';
-	gameContainer.style.opacity = '1';
+	document.getElementById('gameContainer').style.opacity = '1'; // Reset opacity
+	// gameContainer.style.opacity = '1';
 	isGameOver = false;
 	isPaused = false;
 	gameStarted = false;
@@ -1050,9 +1052,7 @@ async function saveGameResult(winner) {
 
     // Determine game type
     let gameType = tournament.isActive ? 'TRN' : 
-					isMatchmaking ? 'OPVP' : 
-                	playerVSbot ? 'PVB' : 
-                	playerVSplayer ? 'PVP' : 'MP';
+		isMatchmaking ? 'MM' : 'PVP';
 
 	// For matchmaking games, use "Player 1" and "Player 2" instead of "You" and "Opponent"
 	const player1_name = isMatchmaking ? "Player 1" : document.getElementById('Name1').textContent;
@@ -1063,12 +1063,10 @@ async function saveGameResult(winner) {
 	if (isMatchmaking) {
 		winnerNumber = winner === "Player 1" ? 1 : 2;
 	} else {
-		// For other game types, use the existing logic
-        winnerNumber = winner === "Player 1" ? 1 : 
-		winner === "Player 2" ? 2 : 
-		winner === "Player 3" ? 3 : 
-		winner === "Player 4" ? 4 : null;
-    }
+		// For PVP games
+        winnerNumber = winner === "Player 1" ? 1 :
+		winner === "Player 2" ? 2 : null;
+	}
 
 	// Determine tournament stage and round
 	let tournamentStage = null;
@@ -1086,16 +1084,13 @@ async function saveGameResult(winner) {
         game_type: gameType,
         player1: player1_name,
         player2: player2_name,
-        player3: document.getElementById('Name3')?.textContent || '',
-        player4: document.getElementById('Name4')?.textContent || '',
         player1_score: player1.score,
         player2_score: player2.score,
-        player3_score: player3?.score || 0,
-        player4_score: player4?.score || 0,
         winner: winnerNumber,
+		timestamp: new Date().toLocaleString(),
 		// Tournament fields
         is_tournament_match: tournament.isActive,
-        tournament_stage: tournamentStage
+        tournament_stage: tournamentStage,
     };
 
     try {
@@ -1232,7 +1227,8 @@ document.getElementById('startMatchBtn').addEventListener('click', () => {
 
 document.getElementById('nextMatchBtn').addEventListener('click', () => {
 	document.getElementById('gameOver').style.display = 'none';
-	gameContainer.style.opacity = '1';
+	document.getElementById('gameContainer').style.opacity = '1'; // Reset opacity
+	// gameContainer.style.opacity = '1';
 
 	if (!tournament.isActive) {
 		// Tournament is complete, return to menu
@@ -1506,7 +1502,7 @@ function showGameOver(winner, score) {
 		returnToMenuBtn.style.display = 'block';
 		nextMatchBtn.style.display = 'none';
 	}
-
+	
 	gameOverScreen.style.display = 'flex';
 	gameContainer.style.opacity = '0.5';
 
@@ -1567,18 +1563,18 @@ const MatchmakingSystem = {
     },
 
     startGame(room_name, role) {
-		isMatchmaking = true;
 		this.isInQueue = false;
         this.isPlayer1 = role === "player1";
         this.gameChannel = new WebSocket(`ws://${window.location.host}/ws/game/${room_name}/`);
         
         this.gameChannel.onopen = () => {
-            console.log("Connected to game channel");
+			console.log("Connected to game channel");
             matchmakingStatus.style.display = 'none';
             landingPage.style.display = 'none';
             gameContainer.style.display = 'flex';
             
             // Initialize game state
+			isMatchmaking = true;
             gameStarted = true;
             playerVSplayer = true;
             isGameOver = false;
@@ -1643,7 +1639,10 @@ const MatchmakingSystem = {
 			// Show game over screen
 			const displayedPlayer1 = "Player 1";
 			const displayedPlayer2 = "Player 2";
+			
 			showGameOver(winner, this.isPlayer1 ? player1.score : player2.score);
+			document.getElementById('gameContainer').style.opacity = '1';
+			document.getElementById('gameOver').style.display = 'none';
 			
 			// Clean up WebSocket connections
 			if (this.gameChannel) {
