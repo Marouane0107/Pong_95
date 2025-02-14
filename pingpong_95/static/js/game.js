@@ -1185,25 +1185,6 @@ document.getElementById('addPlayerBtn').addEventListener('click', () => {
     }
 });
 
-// Optional: Add input validation while typing
-document.getElementById('playerNameInput').addEventListener('input', (e) => {
-    const input = e.target;
-    const name = input.value.trim();
-    
-    // Check for duplicate names in real-time
-    const isDuplicate = tournament.players.some(player => 
-        player.toLowerCase() === name.toLowerCase()
-    );
-    
-    if (isDuplicate) {
-        input.classList.add('duplicate');
-        // Windows 95 style alert when needed
-        // alert('This name is already taken');
-    } else {
-        input.classList.remove('duplicate');
-    }
-});
-
 document.getElementById('startTournamentBtn').addEventListener('click', () => {
 	if (tournament.players.length >= 4) {
 		initializeTournament();
@@ -1506,7 +1487,7 @@ function showGameOver(winner, score) {
 	gameOverScreen.style.display = 'flex';
 	gameContainer.style.opacity = '0.5';
 
-	if (!tournament.isActive && !resultSaved) {
+	if (!tournament.isActive && !resultSaved && isMatchmaking) {
 		saveGameResult(winner);
 		resultSaved = true;
 	}
@@ -1517,6 +1498,7 @@ function showGameOver(winner, score) {
 // Get elements
 const matchmakingButton = document.getElementById("Matchmaking");
 const matchmakingStatus = document.getElementById("matchmakingStatus");
+const cancelMatchmakingBtn = document.getElementById("cancelMatchmaking");
 
 // Add lerp helper function for smooth interpolation
 function lerp(start, end, t) {
@@ -1537,12 +1519,14 @@ const MatchmakingSystem = {
         this.socket.onopen = () => {
             console.log("Connected to matchmaking server");
             matchmakingStatus.textContent = "Searching for opponent...";
+			cancelMatchmakingBtn.style.display = "block"; // Show cancel button
 			resolve(); // Resolve the promise when connection is established
         };
         
         this.socket.onclose = () => {
             console.log("Disconnected from matchmaking");
             matchmakingStatus.style.display = "none";
+			cancelMatchmakingBtn.style.display = "none"; // Hide cancel button
             this.isInQueue = false;
         };
         
@@ -1560,6 +1544,19 @@ const MatchmakingSystem = {
             }
         };
 		});
+    },
+
+	cancelQueue() {
+        if (this.socket?.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({
+                action: "leave_queue"
+            }));
+            this.socket.close();
+            this.isInQueue = false;
+            matchmakingStatus.style.display = "none";
+            cancelMatchmakingBtn.style.display = "none";
+            landingPage.style.display = "flex"; // Show landing page again
+        }
     },
 
     startGame(room_name, role) {
@@ -1741,5 +1738,12 @@ window.addEventListener('beforeunload', (e) => {
             }));
         }
         MatchmakingSystem.handlePlayerLeave();
+    }
+});
+
+// event listener for cancel button
+cancelMatchmakingBtn.addEventListener("click", () => {
+    if (MatchmakingSystem.isInQueue) {
+        MatchmakingSystem.cancelQueue();
     }
 });

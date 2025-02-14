@@ -482,7 +482,7 @@ h1 {
     background-color: #21a1f1;
 }
 
-/* /static/css/game.css */
+/* Settings Menu Button Styles */
 .instructions {
     background-color: #ffffff;
     border: 2px solid #808080;
@@ -856,4 +856,27 @@ h1 {
     font-family: 'MS Sans Serif', sans-serif;
     color: white;
     margin-top: 10px;
+}
+
+#cancelMatchmaking {
+    font-family: 'MS Sans Serif', sans-serif;
+    background-color: #bfbfbf;
+    color: white;
+    padding: 8px 12px; /* Increased vertical padding */
+    font-size: 0.95rem;
+    border: 2px solid #dfdfdf;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 130px; /* Reduced width */
+    height: 36px; /* Increased height */
+    text-align: center;
+    margin: 0 auto;
+}
+
+#cancelMatchmaking:hover {
+    background-color: gray;
+    color: black;
 }
