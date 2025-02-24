@@ -9,8 +9,9 @@ class GameResult(models.Model):
     ]
 
     game_type = models.CharField(max_length=4, choices=GAME_TYPES)
+    # user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player1_games')
-    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player2_games', null=True, blank=True)
+    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player2_games')
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='won_games')

@@ -1,6 +1,6 @@
+from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 import re
-from channels.generic.websocket import AsyncWebsocketConsumer
 
 class MatchmakingConsumer(AsyncWebsocketConsumer):
     players = []
