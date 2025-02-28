@@ -1,12 +1,20 @@
 // Wait for DOM content to be loaded before initializing game logic
 document.addEventListener('DOMContentLoaded', () => {
 	// Import the createGameUI function from index.js
-	import('/static/js/index.js')
+	import('./index.js')
 		.then(module => {
 			// Create the UI first
 			module.createGameUI();
 			// Then initialize the game after a short delay
 			setTimeout(() => {
+				// Get UI elements after they're created
+				const Player_vs_BOT = document.getElementById('Player_vs_BOT');
+				const Player_vs_Player = document.getElementById('Player_vs_Player');
+				const Multiplayer = document.getElementById('Multiplayer');
+				const Restart = document.getElementById("Restart");
+				const Quit = document.getElementById("Quit");
+				const Menu = document.getElementById("Menu");
+				const QuitMenu = document.getElementById("QuitMenu");
 				initializeGame();
 			}, 100);
 		})
@@ -76,7 +84,7 @@ function initializeGame() {
 
 	window.addEventListener('keydown', function(e) {
 		if (isMatchmaking) {
-			// For matchmaking games, only handle controls for your assigned player
+			// Matchmaking controls (existing code)
 			if (MatchmakingSystem.isPlayer1) {
 				if (e.keyCode === key_W) keysPressed[key_W] = true;
 				if (e.keyCode === key_S) keysPressed[key_S] = true;
@@ -84,8 +92,18 @@ function initializeGame() {
 				if (e.keyCode === key_Up) keysPressed[key_Up] = true;
 				if (e.keyCode === key_Down) keysPressed[key_Down] = true;
 			}
+		} else if (multiplayer) {
+			// Multiplayer controls - all players (existing code)
+			if (e.keyCode === key_W) keysPressed[key_W] = true;
+			if (e.keyCode === key_S) keysPressed[key_S] = true;
+			if (e.keyCode === key_Up) keysPressed[key_Up] = true;
+			if (e.keyCode === key_Down) keysPressed[key_Down] = true;
+			if (e.keyCode === key_G) keysPressed[key_G] = true;
+			if (e.keyCode === key_H) keysPressed[key_H] = true;
+			if (e.keyCode === key_7) keysPressed[key_7] = true;
+			if (e.keyCode === key_9) keysPressed[key_9] = true;
 		} else {
-			// For local games, handle all controls
+			// Regular game controls
 			if (e.keyCode === key_W) keysPressed[key_W] = true;
 			if (e.keyCode === key_S) keysPressed[key_S] = true;
 			if (e.keyCode === key_Up) keysPressed[key_Up] = true;
@@ -95,7 +113,7 @@ function initializeGame() {
 
 	window.addEventListener('keyup', function(e) {
 		if (isMatchmaking) {
-			// For matchmaking games, only handle controls for your assigned player
+			// Matchmaking controls (existing code)
 			if (MatchmakingSystem.isPlayer1) {
 				if (e.keyCode === key_W) keysPressed[key_W] = false;
 				if (e.keyCode === key_S) keysPressed[key_S] = false;
@@ -103,8 +121,18 @@ function initializeGame() {
 				if (e.keyCode === key_Up) keysPressed[key_Up] = false;
 				if (e.keyCode === key_Down) keysPressed[key_Down] = false;
 			}
+		} else if (multiplayer) {
+			// Multiplayer controls - allow Player 1 and Player 2 and Player 3 and Player 4
+			if (e.keyCode === key_W) keysPressed[key_W] = false;
+			if (e.keyCode === key_S) keysPressed[key_S] = false;
+			if (e.keyCode === key_Up) keysPressed[key_Up] = false;
+			if (e.keyCode === key_Down) keysPressed[key_Down] = false;
+			if (e.keyCode === key_G) keysPressed[key_G] = false;
+			if (e.keyCode === key_H) keysPressed[key_H] = false;
+			if (e.keyCode === key_7) keysPressed[key_7] = false;
+			if (e.keyCode === key_9) keysPressed[key_9] = false;
 		} else {
-			// For local games, handle all controls
+			// Regular game controls
 			if (e.keyCode === key_W) keysPressed[key_W] = false;
 			if (e.keyCode === key_S) keysPressed[key_S] = false;
 			if (e.keyCode === key_Up) keysPressed[key_Up] = false;
@@ -117,112 +145,111 @@ function initializeGame() {
 		return { x: x, y: y };
 	}
 
+	document.getElementById('QuitMenu').addEventListener('click', () => {
+		// Try different approaches to close the window
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't quit game in this mode, please finish the game first.");
+			return;
+		}
+		// If on landing page, try to close the window
+		if (window.opener) {
+			window.close();
+		} else {
+			window.location.href = 'about:blank';
+			window.close();
+		}
+	});
 
-	document.querySelectorAll("button").forEach(button => {
-		QuitMenu.addEventListener('click', () => {
-			// Try different approaches to close the window
-			if (tournament.isActive || isMatchmaking) {
-				console.log("Can't quit game in this mode, please finish the game first.");
-				return;
-			}
-			if (window.opener) {
-				window.close();
-			} else {
-				window.location.href = 'about:blank';
-				window.close();
-			}
-		});
-		Player_vs_BOT.addEventListener('click', () => {
-			initializeAudio();
-			resultSaved = false;
-			isPaused = false;
-			landingPage.style.display = 'none';
-			gameContainer.style.display = 'flex';
-			gameStarted = true;
-			playerVSbot = true;
-			// Reset scores
-				player1.score = 0;
-				player2.score = 0;
-				document.getElementById("Player_1").innerHTML = "0";
-				document.getElementById("Player_2").innerHTML = "0";
-			// Set Name for Player 1 and Player 2
-				document.getElementById("Name1").innerHTML = "Player";
-				document.getElementById("Name2").innerHTML = "BOT";
-		});
-		Player_vs_Player.addEventListener('click', () => {
-			initializeAudio();
-			resultSaved = false;
-			isPaused = false;
-			landingPage.style.display = 'none';
-			gameContainer.style.display = 'flex';
-			gameStarted = true;
-			playerVSplayer = true;
-			// Reset scores
-				player1.score = 0;
-				player2.score = 0;
-				document.getElementById("Player_1").innerHTML = "0";
-				document.getElementById("Player_2").innerHTML = "0";
-			// Set Name for Player 1 and Player 2
-				document.getElementById("Name1").innerHTML = "Player_1";
-				document.getElementById("Name2").innerHTML = "Player_2";
-		});
-		Multiplayer.addEventListener('click', () => {
-			initializeAudio();
-			resultSaved = false;
-			isPaused = false;
-			landingPage.style.display = 'none';
-			gameContainer.style.display = 'flex';
-			document.getElementById("Player_3").style.display = 'block';
-			document.getElementById("Player_4").style.display = 'block';
-			document.getElementById("Name3").style.display = 'block';
-			document.getElementById("Name4").style.display = 'block';
-			gameStarted = true;
-			multiplayer = true;
-			// Reset all scores
-				player_1.score = 0;
-				player_2.score = 0;
-				player3.score = 0;
-				player4.score = 0;
-				document.getElementById("Player_1").innerHTML = "0";
-				document.getElementById("Player_2").innerHTML = "0";
-				document.getElementById("Player_3").innerHTML = "0";
-				document.getElementById("Player_4").innerHTML = "0";
-			// Set Name for Player 1, Player 2, Player 3 and Player 4
-				document.getElementById("Name1").innerHTML = "Player_1";
-				document.getElementById("Name2").innerHTML = "Player_2";
-				document.getElementById("Name3").innerHTML = "Player_3";
-				document.getElementById("Name4").innerHTML = "Player_4";
-		});
-		Restart.addEventListener("click", () => {
-			console.log("Restart button clicked");
-			if (tournament.isActive || isMatchmaking) {
-				console.log("Can't restart game in this mode, please finish the game first.");
-				return;
-			}
-			// saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
-			resetBall(ball);
-			setAlltoZero();
-		});
-		Menu.addEventListener("click", () => {
-			console.log("Menu button clicked");
-			if (tournament.isActive || isMatchmaking) {
-				console.log("Can't return to menu in this mode, please finish the game first.");
-				return;
-			}
-			resetBall(ball);
-			// saveInterruptedGame('Return to Menu before the game over');
-			setAlltoZero();
-			landingPage.style.display = 'flex'; // Show landing page
-			gameContainer.style.display = 'none'; // Hide game container
-			document.getElementById("Player_3").style.display = 'none';
-			document.getElementById("Player_4").style.display = 'none';
-			document.getElementById("Name3").style.display = 'none';
-			document.getElementById("Name4").style.display = 'none';
-			gameStarted = false;
-			playerVSplayer = false;
-			playerVSbot = false;
-			multiplayer = false;
-		});
+	document.getElementById('Player_vs_BOT').addEventListener('click', () => {
+		initializeAudio();
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		gameStarted = true;
+		playerVSbot = true;
+		// Reset scores
+			player1.score = 0;
+			player2.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+		// Set Name for Player 1 and Player 2
+			document.getElementById("Name1").innerHTML = "Player";
+			document.getElementById("Name2").innerHTML = "BOT";
+	});
+	document.getElementById('Player_vs_Player').addEventListener('click', () => {
+		initializeAudio();
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		gameStarted = true;
+		playerVSplayer = true;
+		// Reset scores
+			player1.score = 0;
+			player2.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+		// Set Name for Player 1 and Player 2
+			document.getElementById("Name1").innerHTML = "Player_1";
+			document.getElementById("Name2").innerHTML = "Player_2";
+	});
+	document.getElementById('Multiplayer').addEventListener('click', () => {
+		initializeAudio();
+		resultSaved = false;
+		isPaused = false;
+		landingPage.style.display = 'none';
+		gameContainer.style.display = 'flex';
+		document.getElementById("Player_3").style.display = 'block';
+		document.getElementById("Player_4").style.display = 'block';
+		document.getElementById("Name3").style.display = 'block';
+		document.getElementById("Name4").style.display = 'block';
+		gameStarted = true;
+		multiplayer = true;
+		// Reset all scores
+			player_1.score = 0;
+			player_2.score = 0;
+			player3.score = 0;
+			player4.score = 0;
+			document.getElementById("Player_1").innerHTML = "0";
+			document.getElementById("Player_2").innerHTML = "0";
+			document.getElementById("Player_3").innerHTML = "0";
+			document.getElementById("Player_4").innerHTML = "0";
+		// Set Name for Player 1, Player 2, Player 3 and Player 4
+			document.getElementById("Name1").innerHTML = "Player_1";
+			document.getElementById("Name2").innerHTML = "Player_2";
+			document.getElementById("Name3").innerHTML = "Player_3";
+			document.getElementById("Name4").innerHTML = "Player_4";
+	});
+	document.getElementById('Restart').addEventListener("click", () => {
+		console.log("Restart button clicked");
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't restart game in this mode, please finish the game first.");
+			return;
+		}
+		// saveInterruptedGame('Game Restarted'); // could be removed in final version because it's lokking not practical <-----> it will save the data of the same game again and again
+		resetBall(ball);
+		setAlltoZero();
+	});
+	document.getElementById('Menu').addEventListener("click", () => {
+		console.log("Menu button clicked");
+		if (tournament.isActive || isMatchmaking) {
+			console.log("Can't return to menu in this mode, please finish the game first.");
+			return;
+		}
+		resetBall(ball);
+		// saveInterruptedGame('Return to Menu before the game over');
+		setAlltoZero();
+		landingPage.style.display = 'flex'; // Show landing page
+		gameContainer.style.display = 'none'; // Hide game container
+		document.getElementById("Player_3").style.display = 'none';
+		document.getElementById("Player_4").style.display = 'none';
+		document.getElementById("Name3").style.display = 'none';
+		document.getElementById("Name4").style.display = 'none';
+		gameStarted = false;
+		playerVSplayer = false;
+		playerVSbot = false;
+		multiplayer = false;
 	});
 
 	function setAlltoZero() {
@@ -1002,16 +1029,20 @@ function initializeGame() {
 	}
 
 	// Event Listeners
-	document.addEventListener('DOMContentLoaded', () => {
+	document.getElementById('Settings').addEventListener('click', () => {
+		if (isMatchmaking) {
+			console.log("Can't open settings during matchmaking");
+			return;
+		}
+		showSettingsMenu();
+	});
+	document.getElementById('saveSettings').addEventListener('click', () => {
+		saveSettings();
+	});
+	document.getElementById('cancelSettings').addEventListener('click', () => {
+		// Restore previous settings and hide menu
 		loadSettings();
-
-		document.getElementById('Settings').addEventListener('click', showSettingsMenu);
-		document.getElementById('saveSettings').addEventListener('click', saveSettings);
-		document.getElementById('cancelSettings').addEventListener('click', () => {
-			// Restore previous settings and hide menu
-			loadSettings();
-			hideSettingsMenu();
-		});
+		hideSettingsMenu();
 	});
 
 	// Add a new variable for game pause state
@@ -1024,52 +1055,9 @@ function initializeGame() {
 		}
 	});
 
-
-	// class GameAPI {
-	// 	static async getGameResults() {
-	// 		const response = await fetch('/api/games/');
-	// 		return await response.json();
-	// 	}
-	// 	static async saveGameResult(gameData) {
-	// 		const response = await fetch('/api/games/', {
-	// 			method: 'POST',
-	// 			headers: {
-	// 				'Content-Type': 'application/json',
-	// 				'X-CSRFToken': this.getCsrfToken(),
-	// 			},
-	// 			body: JSON.stringify(gameData)
-	// 		});
-	// 		return await response.json();
-	// 	}
-
-	// 	static getCsrfToken() {
-	// 		return document.querySelector('[name=csrfmiddlewaretoken]').value;
-	// 	}
-	// }
-
-	function getCsrfToken() {
-		// Try cookie first
-		const cookies = document.cookie.split(';');
-		const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
-		if (csrfCookie) {
-			return csrfCookie.split('=')[1];
-		}
-
-		// Fallback to meta tag
-		const metaToken = document.querySelector('meta[name="csrf-token"]');
-		if (metaToken) {
-			return metaToken.getAttribute('content');
-		}
-
-		console.error('CSRF token not found');
-		return null;
-	}
-
 	async function saveGameResult(winner) {
 		// Only save results for matchmaking games
 		if (!isMatchmaking) return;
-	
-		const csrfToken = getCsrfToken();
 	
 		// Determine winner number (1 for Player 1, 2 for Player 2)
 		const winnerNumber = winner === "Player 1" ? 1 : 2;
@@ -1091,7 +1079,6 @@ function initializeGame() {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-CSRFToken': csrfToken
 				},
 				body: JSON.stringify(data)
 			});
@@ -1130,13 +1117,18 @@ function initializeGame() {
 	
 	// Tournament Management -------------------------------------------------------------------------------------------------
 
-	async function saveTournamentResult(winner) { // Save tournament results ----------------------------------------------
+	async function saveTournamentResult(winner) {
 		// Only save results for tournament games
 		if (!tournament.isActive) return;
 	
-		const csrfToken = getCsrfToken();
-	
-		// Determine winner number based on current match
+		// Get the current match details
+		const currentMatch = tournament.matches[tournament.currentMatchIndex];
+		
+		// Get actual display names from the game UI
+		const displayedPlayer1 = document.getElementById('Name1').textContent;
+		const displayedPlayer2 = document.getElementById('Name2').textContent;
+		
+		// Determine winner number based on who won
 		const winnerNumber = winner === "Player 1" ? 1 : 2;
 	
 		// Determine tournament stage
@@ -1144,8 +1136,8 @@ function initializeGame() {
 	
 		const data = {
 			game_type: 'TRN', // TRN for tournament
-			player1: tournament.matches[tournament.currentMatchIndex].player1,
-			player2: tournament.matches[tournament.currentMatchIndex].player2,
+			player1: displayedPlayer1, // Use actual displayed names
+			player2: displayedPlayer2,
 			player1_score: player1.score,
 			player2_score: player2.score,
 			winner: winnerNumber,
@@ -1159,7 +1151,6 @@ function initializeGame() {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-CSRFToken': csrfToken	//in Django (the backend framework) requires CSRF tokens for POST requests by default The token verifies that the request comes from your own website, not a malicious one
 				},
 				body: JSON.stringify(data)
 			});
@@ -1185,32 +1176,31 @@ function initializeGame() {
 		startBtn.disabled = true;
 
 		try {
-			const response = await fetch('/api/tournament/request/', // API endpoint for tournament requests
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': getCsrfToken()
-				},
-				body: JSON.stringify({
-					players: tournament.players,
-					timestamp: new Date().toLocaleString()
-				})
-			});
+			// const response = await fetch('/api/tournament/request/', // API endpoint for tournament requests
+			// {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 	},
+			// 	body: JSON.stringify({
+			// 		players: tournament.players,
+			// 		timestamp: new Date().toLocaleString()
+			// 	})
+			// });
 
-			const result = await response.json();
+			// const result = await response.json();
 			
-			if (!response.ok) {
-				throw new Error(result.message || 'Failed to start tournament');
-			}
+			// if (!response.ok) {
+			// 	throw new Error(result.message || 'Failed to start tournament');
+			// }
 			
-			if (result.status === 'approved') {
-				initializeTournament();
-				document.querySelector('.tournament-setup').style.display = 'none';
-				document.querySelector('.tournament-bracket').style.display = 'block';
-			} else {
-				throw new Error(result.message || 'Tournament request denied');
-			}
+			// if (result.status === 'approved') {
+			// 	initializeTournament();
+			// 	document.querySelector('.tournament-setup').style.display = 'none';
+			// 	document.querySelector('.tournament-bracket').style.display = 'block';
+			// } else {
+			// 	throw new Error(result.message || 'Tournament request denied');
+			// }
 		} catch (error) {
 			console.error('Tournament request failed:', error);
 			alert('Failed to start tournament: ' + error.message);
@@ -1633,7 +1623,7 @@ function initializeGame() {
 
 		connect() {
 			return new Promise((resolve) => {
-			this.socket = new WebSocket(`ws://${window.location.host}/ws/matchmaking/`);
+			this.socket = new WebSocket(`ws://127.0.0.1:8000/ws/matchmaking/`);
 			
 			this.socket.onopen = () => {
 				console.log("Connected to matchmaking server");
@@ -1681,7 +1671,7 @@ function initializeGame() {
 		startGame(room_name, role) {
 			this.isInQueue = false;
 			this.isPlayer1 = role === "player1";
-			this.gameChannel = new WebSocket(`ws://${window.location.host}/ws/game/${room_name}/`);
+			this.gameChannel = new WebSocket(`ws://127.0.0.1:8000/ws/game/${room_name}/`);
 			
 			this.gameChannel.onopen = () => {
 				console.log("Connected to game channel");

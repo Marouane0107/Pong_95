@@ -52,7 +52,7 @@ function createGameUI() {
                         <button id="Menu">Menu</button>
                         <button id="Settings">Settings</button>
                         <button id="Restart">Restart</button>
-                        <button id="Quit">Quit</button>
+                        <button id="QuitMenu">Quit</button>
                     </div>
                 </div>
             </div>
