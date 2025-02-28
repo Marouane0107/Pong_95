@@ -33,9 +33,9 @@ class SPAView(View):
         response['Access-Control-Allow-Headers'] = 'X-CSRFToken'
         return response
 
-class GameResultViewSet(viewsets.ModelViewSet):
-    queryset = GameResult.objects.all().select_related('player1', 'player2', 'winner')
-    serializer_class = GameResultSerializer
+# class GameResultViewSet(viewsets.ModelViewSet):
+#     queryset = GameResult.objects.all().select_related('player1', 'player2', 'winner')
+#     serializer_class = GameResultSerializer
 
 
 class GameResultAPIView(APIView):

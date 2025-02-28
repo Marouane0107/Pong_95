@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 
 class GameResult(models.Model):
     GAME_TYPES = [
-        ('PVP', 'Player vs Player'),
         ('TRN', 'Tournament Match'),
         ('MM', 'Matchmaking'),
     ]
