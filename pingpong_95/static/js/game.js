@@ -122,7 +122,7 @@ function initializeGame() {
 				if (e.keyCode === key_Down) keysPressed[key_Down] = false;
 			}
 		} else if (multiplayer) {
-			// Multiplayer controls - allow Player 1 and Player 2 and Player 3 and Player 4
+			// Multiplayer controls - allow all players to move (existing code)
 			if (e.keyCode === key_W) keysPressed[key_W] = false;
 			if (e.keyCode === key_S) keysPressed[key_S] = false;
 			if (e.keyCode === key_Up) keysPressed[key_Up] = false;
@@ -1064,8 +1064,8 @@ function initializeGame() {
 	
 		const data = {
 			game_type: 'MM', // MM for matchmaking
-			player1: "Player 1", // Default names for matchmaking
-			player2: "Player 2",
+			player1: document.getElementById('Name1').textContent, // need to get the actual displayed names after adding the user input
+			player2: document.getElementById('Name2').textContent, // need to get the actual displayed names after adding the user input
 			player1_score: player1.score,
 			player2_score: player2.score,
 			winner: winnerNumber,
@@ -1092,8 +1092,8 @@ function initializeGame() {
 			resultSaved = true;
 		} catch (error) {
 			console.error('Failed to save matchmaking game result:', error);
-		}
-	}
+				}
+			}
 	
 	
 	
